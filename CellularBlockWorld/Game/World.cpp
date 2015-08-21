@@ -19,8 +19,8 @@ void World::BuildZone()
 	unsigned int y = 0;
 	unsigned int z = 0;
 
-	m_solidBlocks.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
-	m_temporaryCellularVector.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
+	//m_solidBlocks.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
+	//m_temporaryCellularVector.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
 
 	int counter = 0;
 
@@ -44,10 +44,12 @@ void World::BuildZone()
 		{
 			m_solidBlocks.push_back(CubeCell(false));
 		}
+
+		m_temporaryCellularVector.push_back((CubeCell(false)));
 	}
 
 	m_renderer.PushCubeVerticesToVBO();
-	m_renderer.PushGridOutlineVerticesToVBO();
+	//m_renderer.PushGridOutlineVerticesToVBO();
 }
 
 void World::TestSolidCellularAutomataPass()
@@ -188,10 +190,12 @@ void World::TestSolidCellularAutomataPass()
 			}
 		}
 
-		if( SOLID_COUNTER >= THRESHOLD )
-			m_temporaryCellularVector.push_back(CubeCell(true));
-		else
-			m_temporaryCellularVector.push_back(CubeCell(false));
+		if( SOLID_COUNTER >= THRESHOLD ) {
+			m_temporaryCellularVector[index].m_isSolid = true;
+		}
+		else {
+			m_temporaryCellularVector[index].m_isSolid = false;
+		}
 
 		SOLID_COUNTER = 0;
 	}
@@ -212,9 +216,9 @@ void World::TestSolidCellularAutomataPass()
 	}
 
 	m_renderer.PushCubeVerticesToVBO();
-	m_renderer.PushGridOutlineVerticesToVBO();
+//	m_renderer.PushGridOutlineVerticesToVBO();
 
-	m_temporaryCellularVector.clear();
+	//m_temporaryCellularVector.clear();
 }
 
 //----------------------------------------------------
@@ -337,25 +341,6 @@ void World::Update()
 void World::Render()
 {	
 	m_renderer.SendViewMatrix(m_camera);
-
-// 	unsigned int x = 0;
-// 	unsigned int y = 0;
-// 	unsigned int z = 0;
-
-// 	for(unsigned int index = 0; index < m_solidBlocks.size(); index++)
-// 	{
-// 		if( m_solidBlocks[index] )
-// 		{
-// 			x = index & 63;
-// 			y = (index >> 6) & 63;
-// 			z = (index >> 12) & 15;
-// // 			x = index & 63;
-// // 			y = (index >> 4) & 63;
-// // 			z = (index >> 8) & 15;
-// 			m_renderer.DrawCube(Vector3(x, y, z));
-// 		}
-// 	}
 	m_renderer.SendCubeVBO();
-
 	m_renderer.PopMatrix();
 }

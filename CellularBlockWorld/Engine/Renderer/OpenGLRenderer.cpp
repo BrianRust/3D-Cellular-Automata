@@ -4,6 +4,7 @@
 PFNGLGENBUFFERSPROC glGenBuffers = nullptr;
 PFNGLBINDBUFFERPROC glBindBuffer = nullptr;
 PFNGLBUFFERDATAPROC glBufferData = nullptr;
+PFNGLBUFFERSUBDATAPROC glBufferSubData = nullptr;
 PFNGLDELETEBUFFERSPROC glDeleteBuffers = nullptr;
 PFNGLGENERATEMIPMAPPROC glGenerateMipmap = nullptr;
 
@@ -244,17 +245,13 @@ void OpenGLRenderer::Initialize()
 
 	m_cameraPosition = glGetUniformLocation(m_shaderProgramID, "u_cameraPosition");
 
-	//m_normalAttributeLocation = glGetAttribLocation(m_shaderProgramID, "v_Normal");
-	//m_biTangentAttributeLocation = glGetAttribLocation(m_shaderProgramID, "v_BiTangent");
-	//m_tangentAttributeLocation = glGetAttribLocation(m_shaderProgramID, "v_Tangent");
-
 	glGenBuffers(1, &m_blockVBOid);
 	glGenBuffers(1, &m_wireframeVBOid);
 
- 	const int NUM_VERTS_PER_BLOCK = 24;
-// 
-// 	m_blockVertices.clear();
- 	m_blockVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK );
+	isInitializing = true;
+
+	//m_blockVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK );
+	//m_wireframeVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK );
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -335,65 +332,65 @@ void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition, const RGBA& co
 	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
 
 
-	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-
-	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-
-	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-
-	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-
-	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-
-	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f , minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-
-	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-
-	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-
-	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-
-	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-
-	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-
-	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 
+// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 
+// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 
+// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 
+// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 
+// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f , minPosition.z + 1.f);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 
+// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 
+// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 
+// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 
+// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 
+// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 
+// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
+// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
 }
 
 //---------------------
@@ -442,12 +439,6 @@ void OpenGLRenderer::SendCubeVBO()
 	timeNow = fmod(timeNow, 1.f);
 	glUniform1f(uniformloc, timeNow);
 	uniformloc = glGetUniformLocation(m_shaderProgramID, "u_diffuseTexture");
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture( GL_TEXTURE_2D, m_orientationTexture->m_openGLTextureID);
-	//glUniform1i( uniformloc, 0 );
-	//uniformloc = glGetUniformLocation(m_shaderProgramID, "u_color");
-	//glUniform
-
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_blockVBOid);
 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (void*) offsetof(Vertex, vertexPosition));
@@ -458,105 +449,28 @@ void OpenGLRenderer::SendCubeVBO()
 	glEnableClientState(GL_COLOR_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 
-	//glEnable(GL_TEXTURE_2D);
-
 	glDrawArrays(GL_QUADS, 0, m_blockVertices.size());
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 
-	//glDisable(GL_TEXTURE_2D);
-
 	//wireframe
-	glBindBuffer(GL_ARRAY_BUFFER, m_wireframeVBOid);
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
-	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, color)); 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-
-	glDrawArrays(GL_LINES, 0, m_wireframeVertices.size());
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
+// 	glBindBuffer(GL_ARRAY_BUFFER, m_wireframeVBOid);
+// 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
+// 	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, color)); 
+// 	glEnableClientState(GL_VERTEX_ARRAY);
+// 	glEnableClientState(GL_COLOR_ARRAY);
+// 
+// 	glDrawArrays(GL_LINES, 0, m_wireframeVertices.size());
+// 	glDisableClientState(GL_VERTEX_ARRAY);
+// 	glDisableClientState(GL_COLOR_ARRAY);
 }
 
 void OpenGLRenderer::DeleteBuffers()
 {
-	const int NUM_VERTS_PER_BLOCK = 24;
+	//glDeleteBuffers(1, &m_blockVBOid);
 	m_blockVertices.clear();
-	//m_blockVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK );
-	
-	glDeleteBuffers(1, &m_blockVBOid);
-	m_blockVertices.clear();
-	glDeleteBuffers(1, &m_wireframeVBOid);
-	m_wireframeVertices.clear();
+
+	//glDeleteBuffers(1, &m_wireframeVBOid);
+	//m_wireframeVertices.clear();
 }
-
-void OpenGLRenderer::ComputeSurfaceTangentsAtVertex(
-	Vector3& surfaceTangentAtVertex_out,
-	Vector3& surfaceBitangentAtVertex_out,
-	const Vector3& normalAtThisVertex,
-	const Vector3& positionOfThisVertex,
-	const Vector2& texCoordsOfThisVertex,
-	const Vector3& positionOfPreviousAdjacentVertex,
-	const Vector2& texCoordsOfPreviousAdjacentVertex,
-	const Vector3& positionOfNextAdjacentVertex,
-	const Vector2& texCoordsOfNextAdjacentVertex )
-{
-	Vector3 vecToPrevious	= positionOfPreviousAdjacentVertex - positionOfThisVertex;
-	Vector3 vecToNext		= positionOfNextAdjacentVertex - positionOfThisVertex;
-
-	Vector2 texToPrevious	= texCoordsOfPreviousAdjacentVertex - texCoordsOfThisVertex;
-	Vector2 texToNext		= texCoordsOfNextAdjacentVertex - texCoordsOfThisVertex;
-
-	float invDeterminant = 1.0f / ((texToPrevious.x * texToNext.y) - (texToNext.x * texToPrevious.y));
-	// (U02 * V01) - (U01 * V02)
-
-	Vector3 uDirectionInWorldSpace(	
-		(texToNext.y * vecToPrevious.x - texToPrevious.y * vecToNext.x),
-		(texToNext.y * vecToPrevious.y - texToPrevious.y * vecToNext.y),
-		(texToNext.y * vecToPrevious.z - texToPrevious.y * vecToNext.z)
-		);
-
-	Vector3 vDirectionInWorldSpace(
-		(texToPrevious.x * vecToNext.x - texToNext.x * vecToPrevious.x),
-		(texToPrevious.x * vecToNext.y - texToNext.x * vecToPrevious.y),
-		(texToPrevious.x * vecToNext.z - texToNext.x * vecToPrevious.z)
-		);
-
-	uDirectionInWorldSpace = uDirectionInWorldSpace * invDeterminant;
-	vDirectionInWorldSpace = vDirectionInWorldSpace * invDeterminant;
-
-	// 	if( abs( normalAtThisVertex.CalcLength() - 1.f ) > 0.01f )
-	// 		FatalError( "Bad normal", "bleagh." );
-
-	Vector3& tangentFromCalculations = uDirectionInWorldSpace;
-	Vector3& bitangentFromCalculations = vDirectionInWorldSpace;
-	Vector3 bitangentFromCross = CrossProduct( normalAtThisVertex, tangentFromCalculations );
-	bitangentFromCross = Normalize(bitangentFromCross);
-	Vector3 tangentFromCross = CrossProduct( bitangentFromCross, normalAtThisVertex );
-
-	float computedBitangentDotCrossBitangent = DotProduct( bitangentFromCalculations, bitangentFromCross );
-	bool isRightHanded = (computedBitangentDotCrossBitangent >= 0.f );
-	if( !isRightHanded )
-	{
-		bitangentFromCross = bitangentFromCross * -1.f;
-	}
-
-	surfaceTangentAtVertex_out = tangentFromCross;
-	//surfaceBitangentAtVertex_out = bitangentFromCross;
-	surfaceBitangentAtVertex_out = bitangentFromCross * -1.f;
-
-	//return( isRightHanded );
-}
-
-/*
-if(m_isKeyDown[ 'P' ])	//Global Point
-{
-m_lights.m_fractionAmbient[0] = 0.f;
-m_lights.m_innerRadius[0] = -5.f;
-m_lights.m_outerRadius[0] = -10.f;
-m_lights.m_innerApertureDot[0] = -0.8f;
-m_lights.m_outerApertureDot[0] = -0.3f;
-m_lights.m_directions[0] = Vector3(0.f, 0.f, 0.f);
-}
-*/

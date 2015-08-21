@@ -35,17 +35,8 @@ public:
 	int CreateFragmentShader(const char* Filename);
 	int CreateShaderProgram(GLint vertexShaderID, GLint fragmentShaderID);
 
-	void ComputeSurfaceTangentsAtVertex(
-		Vector3& surfaceTangentAtVertex_out,
-		Vector3& surfaceBitangentAtVertex_out,
-		const Vector3& normalAtThisVertex,
-		const Vector3& positionOfThisVertex,
-		const Vector2& texCoordsOfThisVertex,
-		const Vector3& positionOfPreviousAdjacentVertex,
-		const Vector2& texCoordsOfPreviousAdjacentVertex,
-		const Vector3& positionOfNextAdjacentVertex,
-		const Vector2& texCoordsOfNextAdjacentVertex );
-	
+	bool isInitializing;
+
 	unsigned int m_blockVBOid;
 	std::vector<Vertex> m_blockVertices;
 
@@ -64,6 +55,7 @@ public:
 extern PFNGLGENBUFFERSPROC glGenBuffers;
 extern PFNGLBINDBUFFERPROC glBindBuffer;
 extern PFNGLBUFFERDATAPROC glBufferData;
+extern PFNGLBUFFERSUBDATAPROC glBufferSubData;
 extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 extern PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 extern PFNGLGETSHADERIVPROC glGetShaderiv;
