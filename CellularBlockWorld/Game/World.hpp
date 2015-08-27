@@ -25,6 +25,7 @@ public:
 	void UpdatePlayerFromInput( float deltaseconds );
 	void UpdateCameraFromInput( float deltaseconds );
 	void CheckForGimbleLock();
+	void Initialize();
 	void BuildZone();
 
 	void TestSolidCellularAutomataPass();

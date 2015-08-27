@@ -68,14 +68,14 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 	case WM_KEYDOWN:
 		{
 			unsigned char asKey = (unsigned char) wParam;
-			if( asKey == VK_ESCAPE )
+			if ( asKey == VK_ESCAPE )
 			{
 				g_isQuitting = true;
 				return 0;
 			}
 
 			bool wasProcessed = g_theWorld.ProcessKeyDownEvent( asKey );
-			if( wasProcessed )
+			if ( wasProcessed )
 			{
 				return 0;
 			}
@@ -89,7 +89,7 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 
 			unsigned char asKey = (unsigned char) wParam;
 			bool wasProcessed = g_theWorld.ProcessKeyUpEvent( asKey );
-			if( wasProcessed )
+			if ( wasProcessed )
 			{
 				return 0;
 			}
@@ -99,17 +99,17 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 	
 	case WM_ACTIVATE:
 		{
-			if( wParam == WA_ACTIVE )
+			if ( wParam == WA_ACTIVE )
 			{
 				g_windowHasFocus = true;
 				break;
 			}
-			else if( wParam == WA_INACTIVE)
+			else if ( wParam == WA_INACTIVE)
 			{
 				g_windowHasFocus = false;
 				break;
 			}
-			else if( wParam == WA_CLICKACTIVE )
+			else if ( wParam == WA_CLICKACTIVE )
 			{
 				g_windowHasFocus = true;
 				break;
@@ -123,18 +123,18 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 		}
 	}
 
-// 	if( wParam == WA_ACTIVE )
+// 	if ( wParam == WA_ACTIVE )
 // 		g_windowHasFocus = true;
 // 
-// 	if( wParam == WA_INACTIVE )
+// 	if ( wParam == WA_INACTIVE )
 // 		g_windowHasFocus = false;
 
-	if( g_windowHasFocus )
+	if ( g_windowHasFocus )
 	{
 		POINT cursorPosition;
 		BOOL cursorPositionResult = GetCursorPos(&cursorPosition);
 
-		if(cursorPositionResult)
+		if (cursorPositionResult)
 		{
 			g_theWorld.m_mousePositionXDifference = (float)(HALF_SCREEN_WIDTH - cursorPosition.x);
 			g_theWorld.m_mousePositionZDifference = (float)(HALF_SCREEN_HEIGHT- cursorPosition.y);
@@ -234,10 +234,10 @@ void CreateOpenGLWindow( HINSTANCE applicationInstanceHandle )
 void RunMessagePump()
 {
 	MSG queuedMessage;
-	for( ;; )
+	for ( ;; )
 	{
 		const BOOL wasMessagePresent = PeekMessage( &queuedMessage, NULL, 0, 0, PM_REMOVE );
-		if( !wasMessagePresent )
+		if ( !wasMessagePresent )
 		{
 			break;
 		}
@@ -251,7 +251,7 @@ void RunMessagePump()
 void Update()
 {
 	g_theWorld.Update();
-	if(g_windowHasFocus)
+	if (g_windowHasFocus)
 		SetCursorPos(HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT);
 }
 
@@ -275,7 +275,7 @@ void WaitUntilNextFrameTime()
 
 	double timeNow = Time::GetCurrentTimeSeconds();
 	static double targetTime = timeNow;
-	while( timeNow < targetTime )
+	while ( timeNow < targetTime )
 	{
 		timeNow = Time::GetCurrentTimeSeconds();
 	}
@@ -300,10 +300,10 @@ int WINAPI WinMain( HINSTANCE applicationInstanceHandle, HINSTANCE, LPSTR comman
 	g_windowHasFocus = true;
 	CreateOpenGLWindow( applicationInstanceHandle );
 	g_theWorld.m_renderer.Initialize();
-	g_theWorld.BuildZone();
+	g_theWorld.Initialize();
 	SetCursorPos(HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT);
 	ShowCursor(false);
-	while( !g_isQuitting )	
+	while ( !g_isQuitting )	
 	{
 		RunFrame();
 	}

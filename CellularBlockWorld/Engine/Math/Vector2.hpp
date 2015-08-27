@@ -23,7 +23,7 @@ inline Vector2 Normalize(const Vector2& first)
 	Vector2 result;
 	float Magnitude = sqrt( (first.x * first.x) + (first.y * first.y) );
 
-	if(Magnitude == 0)
+	if (Magnitude == 0)
 	{
 		result.x = 0;
 		result.y = 0;
@@ -86,7 +86,7 @@ inline Vector2 operator / (const Vector2& first, float second)
 
 inline bool operator == (const Vector2& first, const Vector2& second)
 {
-	if( first.x == second.x && first.y == second.y )
+	if ( first.x == second.x && first.y == second.y )
 	{
 		return true;
 	}

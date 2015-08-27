@@ -18,9 +18,9 @@ public:
 
 inline bool operator == (const IntVector2& lhs, const IntVector2& rhs)
 {
-	if(lhs.y == rhs.y)
+	if (lhs.y == rhs.y)
 	{
-		if(lhs.x == rhs.x)
+		if (lhs.x == rhs.x)
 		{
 			return true;
 		}
@@ -45,9 +45,9 @@ inline IntVector2 operator - (const IntVector2& first, const IntVector2& second)
 
 inline bool operator < (const IntVector2& lhs, const IntVector2& rhs)
 {
-	if(lhs.y == rhs.y)
+	if (lhs.y == rhs.y)
 	{
-		if(lhs.x < rhs.x)
+		if (lhs.x < rhs.x)
 		{
 			return true;
 		}
@@ -58,7 +58,7 @@ inline bool operator < (const IntVector2& lhs, const IntVector2& rhs)
 	}
 	else
 	{
-		if(lhs.y < rhs.y)
+		if (lhs.y < rhs.y)
 		{
 			return true;
 		}

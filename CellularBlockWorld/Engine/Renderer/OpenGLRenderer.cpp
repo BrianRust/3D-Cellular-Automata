@@ -71,7 +71,7 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename)
 	glCompileShader( shaderID );
 	glGetShaderiv( shaderID, GL_COMPILE_STATUS, &wasSuccessful );
 	delete[] shaderText;
-	if( wasSuccessful != GL_TRUE )
+	if ( wasSuccessful != GL_TRUE )
 	{
 		int errorCounter = 0;
 		GLint infoLogLength;
@@ -80,9 +80,9 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename)
 		glGetShaderInfoLog( shaderID, infoLogLength, NULL, infoLogText );
 		int filePathLength = strlen(Filename);
 
-		for(int index = 0; index < infoLogLength+1; index++)
+		for (int index = 0; index < infoLogLength+1; index++)
 		{
-			if(infoLogText[index] == '\n')
+			if (infoLogText[index] == '\n')
 			{
 				errorCounter++;
 			}
@@ -94,7 +94,7 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename)
 
 		std::string infoLogString( infoLogText );
 
-		for(int index = 0; index < errorCounter; index++)
+		for (int index = 0; index < errorCounter; index++)
 		{
 			infoLogString.replace(infoLogString.find("0("), 2, replaceText);
 		}
@@ -145,7 +145,7 @@ int OpenGLRenderer::CreateFragmentShader(const char* Filename)
 
 	glGetShaderiv( shaderID, GL_COMPILE_STATUS, &wasSuccessful );
 	delete[] shaderText;
-	if( wasSuccessful != GL_TRUE )
+	if ( wasSuccessful != GL_TRUE )
 	{
 		int errorCounter = 0;
 		GLint infoLogLength;
@@ -154,9 +154,9 @@ int OpenGLRenderer::CreateFragmentShader(const char* Filename)
 		glGetShaderInfoLog( shaderID, infoLogLength, NULL, infoLogText );
 		int filePathLength = strlen(Filename);
 
-		for(int index = 0; index < infoLogLength+1; index++)
+		for (int index = 0; index < infoLogLength+1; index++)
 		{
-			if(infoLogText[index] == '\n')
+			if (infoLogText[index] == '\n')
 			{
 				errorCounter++;
 			}
@@ -168,7 +168,7 @@ int OpenGLRenderer::CreateFragmentShader(const char* Filename)
 
 		std::string infoLogString( infoLogText );
 
-		for(int index = 0; index < errorCounter; index++)
+		for (int index = 0; index < errorCounter; index++)
 		{
 			infoLogString.replace(infoLogString.find("0("), 2, replaceText);
 		}
@@ -196,7 +196,7 @@ int OpenGLRenderer::CreateShaderProgram(GLint vertexShaderID, GLint fragmentShad
 	glAttachShader( shaderProgramID, fragmentShaderID );
 	glLinkProgram( shaderProgramID );
 	glGetProgramiv( shaderProgramID ,GL_LINK_STATUS, &wasSuccessful);
-	if(wasSuccessful != GL_TRUE)
+	if (wasSuccessful != GL_TRUE)
 	{
 		GLint infoLogLength;
 		glGetProgramiv( shaderProgramID, GL_INFO_LOG_LENGTH, &infoLogLength );
