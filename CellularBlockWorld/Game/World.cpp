@@ -28,13 +28,17 @@ void World::BuildZone()
 	{
 		if( (rand() % 100) < ConstantParameters::SOLID_BLOCK_PERCENTAGE )
 		{
-			x = index & 255;
-			y = (index >> 7) & 255;
-			z = (index >> 14) & 63;
+// 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
+// 			y = (index >> 7) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+// 			z = (index >> 14) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
-// 			x = index & 63;
-// 			y = (index >> 6) & 63;
-// 			z = (index >> 12) & 15;
+			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
+			y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+			z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+
+// 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
+// 			y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+// 			z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 			m_solidBlocks.push_back(CubeCell(true));
 			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
 
@@ -64,8 +68,8 @@ void World::TestSolidCellularAutomataPass()
 	for(unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++)
 	{
 		x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
-		y = (index >> 7) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-		z = (index >> 14) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+		y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+		z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 		
 		//ABOVE
 		if( z < ( ConstantParameters::BLOCKS_Z_AXIS - 1 ) )
@@ -209,8 +213,8 @@ void World::TestSolidCellularAutomataPass()
 		if( m_solidBlocks[index].m_isSolid )
 		{
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
-			y = (index >> 7) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-			z = (index >> 14) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
+			y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+			z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
 			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
 		}
 	}
