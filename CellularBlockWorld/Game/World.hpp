@@ -26,16 +26,19 @@ public:
 	void UpdateCameraFromInput( float deltaseconds );
 	void CheckForGimbleLock();
 	void Initialize();
-	void BuildZone();
+	void BuildZone2D();
+	void BuildZone3D();
 
 	void TestSolidCellularAutomataPass();
+
+	void GameOfLifeCellularAutomataPass2D();
+	void GameOfLifeCellularAutomataPass3D();
 
 	void Update();
 	void Render();
 
 	bool m_isKeyDown[ 256 ];
 	std::vector<CubeCell> m_solidBlocks;
-
 	bool m_keyIsHeld;
 
 	std::vector<CubeCell> m_temporaryCellularVector;
@@ -45,9 +48,10 @@ public:
 
 	float m_mousePositionXDifference;
 	float m_mousePositionZDifference;
-
 	float m_textureX;
 	float m_textureY;
+
+	bool m_is2DWorld;
 };
 
 #endif //included_World

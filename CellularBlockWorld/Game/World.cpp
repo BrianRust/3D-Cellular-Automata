@@ -5,6 +5,7 @@
 World::World(  ) 
 	: m_mousePositionXDifference(0.f)
 	, m_mousePositionZDifference(0.f)
+	, m_is2DWorld(false)
 {
 	srand ((unsigned int)(time(NULL)));
 
@@ -20,10 +21,46 @@ void World::Initialize()
 		m_solidBlocks.push_back(CubeCell(false));
 	}
 
-	BuildZone();
+	BuildZone3D();
 }
 
-void World::BuildZone()
+void World::BuildZone2D()
+{
+	unsigned int x = 0;
+	unsigned int y = 0;
+	unsigned int z = 0;
+
+	//m_solidBlocks.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
+	//m_temporaryCellularVector.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
+
+	int counter = 0;
+
+	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_DEPTH; index++)
+	{
+		if ( (rand() % 100) < ConstantParameters::SOLID_BLOCK_PERCENTAGE_2D )
+		{
+			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
+			y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+			z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+
+			m_solidBlocks[index] = true;
+			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
+
+			counter++;
+		}
+		else
+		{
+			m_solidBlocks[index] = false;
+		}
+
+		m_temporaryCellularVector.push_back((CubeCell(false)));
+	}
+
+	m_renderer.PushCubeVerticesToVBO();
+	//m_renderer.PushGridOutlineVerticesToVBO();
+}
+
+void World::BuildZone3D()
 {
 	unsigned int x = 0;
 	unsigned int y = 0;
@@ -36,14 +73,13 @@ void World::BuildZone()
 
 	for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++)
 	{
-		if ( (rand() % 100) < ConstantParameters::SOLID_BLOCK_PERCENTAGE )
+		if ( (rand() % 100) < ConstantParameters::SOLID_BLOCK_PERCENTAGE_3D )
 		{
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
 			y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
 			z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
 			m_solidBlocks[index] = true;
-			//m_solidBlocks.push_back(CubeCell(true));
 			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
 
 			counter++;
@@ -51,7 +87,6 @@ void World::BuildZone()
 		else
 		{
 			m_solidBlocks[index] = false;
-			//m_solidBlocks.push_back(CubeCell(false));
 		}
 
 		m_temporaryCellularVector.push_back((CubeCell(false)));
@@ -267,7 +302,15 @@ void World::UpdatePlayerFromInput( float deltaSeconds )
 	{
 		m_keyIsHeld = true;
 		m_renderer.DeleteBuffers();
-		BuildZone();
+		BuildZone3D();
+		m_is2DWorld = false;
+	}
+
+	if ( m_isKeyDown[ 'E' ] )
+	{
+		m_renderer.DeleteBuffers();
+		BuildZone2D();
+		m_is2DWorld = true;
 	}
 	
 	if (m_isKeyDown[ VK_LEFT ])
@@ -352,6 +395,11 @@ void World::Update()
 	UpdatePlayerFromInput( deltaSeconds );
 	UpdateCameraFromInput( deltaSeconds );
 	CheckForGimbleLock();
+
+	if (m_is2DWorld){
+		m_renderer.DeleteBuffers();
+		GameOfLifeCellularAutomataPass2D();
+	}
 }
 
 //----------------------------------------------------
@@ -360,4 +408,101 @@ void World::Render()
 	m_renderer.SendViewMatrix(m_camera);
 	m_renderer.SendCubeVBO();
 	m_renderer.PopMatrix();
+}
+
+//----------------------------------------------------
+void World::GameOfLifeCellularAutomataPass2D()
+{
+	unsigned int x = 0;
+	unsigned int y = 0;
+	unsigned int z = 0;
+
+	unsigned int SOLID_COUNTER = 0;
+	
+	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_DEPTH; index++)
+	{
+		x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
+		y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+		z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+
+		if ( x > 0 )	//left
+		{
+			if ( m_solidBlocks[ index - 1 ].m_isSolid )	//left
+				SOLID_COUNTER++;
+
+			if ( y > 0 )
+			{
+				if ( m_solidBlocks[ index - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )	//bottom
+					SOLID_COUNTER++;
+
+				if ( m_solidBlocks[ index - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )	//left bottom
+					SOLID_COUNTER++;
+			}
+
+			if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) )
+			{
+				if ( m_solidBlocks[ index + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) //top
+					SOLID_COUNTER++;
+				
+				if ( m_solidBlocks[ index - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )	//left top
+					SOLID_COUNTER++;
+			}
+
+		}
+
+		if ( x < ( ConstantParameters::BLOCKS_X_AXIS - 1 ) )	//right
+		{
+			if ( m_solidBlocks[ index + 1 ].m_isSolid )	//right
+				SOLID_COUNTER++;
+
+			if ( y > 0 )	//bottom right
+			{
+				if ( m_solidBlocks[ index + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )
+					SOLID_COUNTER++;
+			}
+
+			if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) )	//above right
+			{
+				if ( m_solidBlocks[ index + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )
+					SOLID_COUNTER++;
+			}
+		}
+
+		if ( SOLID_COUNTER == ConstantParameters::PRODUCE_LIFE_THRESHOLD_2D )
+		{
+			m_temporaryCellularVector[index].m_isSolid = true;
+		} 
+		else if ( ( SOLID_COUNTER <= ConstantParameters::REMOVE_LIFE_THRESHOLD_LOWERBOUND_2D ) || ( SOLID_COUNTER >= ConstantParameters::REMOVE_LIFE_THRESHOLD_UPPERBOUND_2D ) ) {
+			m_temporaryCellularVector[index].m_isSolid = false;
+		}
+		else {
+			m_temporaryCellularVector[index].m_isSolid = m_solidBlocks[index].m_isSolid;
+		}
+
+		SOLID_COUNTER = 0;
+	}
+
+	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_DEPTH; index++)
+	{
+		m_solidBlocks[index] = m_temporaryCellularVector[index];
+
+		if ( m_solidBlocks[index].m_isSolid )
+		{
+			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
+			y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+			z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
+			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
+		}
+	}
+
+	m_renderer.PushCubeVerticesToVBO();
+}
+
+//----------------------------------------------------
+void World::GameOfLifeCellularAutomataPass3D()
+{
+	for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++)
+	{
+
+	}
 }
