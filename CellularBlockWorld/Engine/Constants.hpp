@@ -28,9 +28,15 @@ namespace ConstantParameters
 	const unsigned int SOLID_BLOCK_PERCENTAGE_2D = 50;
 	const unsigned int SOLID_BLOCK_PERCENTAGE_3D = 10;
 
+//2D checks 8 Cubes
 	const unsigned int PRODUCE_LIFE_THRESHOLD_2D = 3;
 	const unsigned int REMOVE_LIFE_THRESHOLD_UPPERBOUND_2D = 4;
 	const unsigned int REMOVE_LIFE_THRESHOLD_LOWERBOUND_2D = 1;
+
+//3D checks 26 Cubes
+	const unsigned int PRODUCE_LIFE_THRESHOLD_3D = 3;
+	const unsigned int REMOVE_LIFE_THRESHOLD_UPPERBOUND_3D = 4;
+	const unsigned int REMOVE_LIFE_THRESHOLD_LOWERBOUND_3D = 1;
 }
 
 #endif //included_Constants

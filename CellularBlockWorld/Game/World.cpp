@@ -295,7 +295,8 @@ void World::UpdatePlayerFromInput( float deltaSeconds )
 	{
 		m_keyIsHeld = true;
 		m_renderer.DeleteBuffers();
-		TestSolidCellularAutomataPass();
+		GameOfLifeCellularAutomataPass3D();
+		//TestSolidCellularAutomataPass();
 	}
 
 	if ( m_isKeyDown[ 'R' ] && !m_keyIsHeld )
@@ -399,6 +400,9 @@ void World::Update()
 	if (m_is2DWorld){
 		m_renderer.DeleteBuffers();
 		GameOfLifeCellularAutomataPass2D();
+	} else {
+		m_renderer.DeleteBuffers();
+		GameOfLifeCellularAutomataPass3D();
 	}
 }
 
@@ -501,8 +505,186 @@ void World::GameOfLifeCellularAutomataPass2D()
 //----------------------------------------------------
 void World::GameOfLifeCellularAutomataPass3D()
 {
+	unsigned int x = 0;
+	unsigned int y = 0;
+	unsigned int z = 0;
+
+	unsigned int SOLID_COUNTER = 0;
+	
 	for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++)
 	{
+		x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
+		y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+		z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
+		//Above
+		if ( z < ( ConstantParameters::BLOCKS_Z_AXIS - 1 ) )
+		{
+			if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT ].m_isSolid )	//above
+				SOLID_COUNTER++;
+
+			if ( x > 0 )	//above left
+			{
+				if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 ].m_isSolid )	//above left
+					SOLID_COUNTER++;
+
+				if ( y > 0 )
+				{
+					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )	//above bottom
+						SOLID_COUNTER++;
+					
+					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) //above left bottom
+						SOLID_COUNTER++;
+				}
+
+				if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) )	
+				{
+					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )	//above top
+						SOLID_COUNTER++;
+
+					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) //above left top
+						SOLID_COUNTER++;
+				}
+			}
+
+			if ( x < ( ConstantParameters::BLOCKS_X_AXIS - 1 ) )	//above right
+			{
+				if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 ].m_isSolid )	//above right
+					SOLID_COUNTER++;
+
+				if ( y > 0 )	//above right bottom
+				{
+					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )
+						SOLID_COUNTER++;
+				}
+
+				if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) )	//above right top
+				{
+					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )
+						SOLID_COUNTER++;
+				}
+			}
+		}
+
+		//Below
+		if ( z > 0 )
+		{
+			if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT ].m_isSolid )	//below
+				SOLID_COUNTER++;
+
+			if ( x > 0 )	//below left
+			{
+				if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 ].m_isSolid )	//below left
+					SOLID_COUNTER++;
+
+				if ( y > 0 )
+				{
+					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )	//below bottom
+						SOLID_COUNTER++;
+
+					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) //below left bottom
+						SOLID_COUNTER++;
+				}
+
+				if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) )	
+				{
+					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )	//below top
+						SOLID_COUNTER++;
+
+					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) //below left top
+						SOLID_COUNTER++;
+				}
+			}
+
+			if ( x < ( ConstantParameters::BLOCKS_X_AXIS - 1 ) )	//below right
+			{
+				if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 ].m_isSolid )	//below right
+					SOLID_COUNTER++;
+
+				if ( y > 0 )	//below right bottom
+				{
+					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )
+						SOLID_COUNTER++;
+				}
+
+				if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) )	//below right top
+				{
+					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )
+						SOLID_COUNTER++;
+				}
+			}
+		}
+
+		//Middle
+		if ( x > 0 )	//left
+		{
+			if ( m_solidBlocks[ index - 1 ].m_isSolid )	//left
+				SOLID_COUNTER++;
+
+			if ( y > 0 )
+			{
+				if ( m_solidBlocks[ index - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )	//bottom
+					SOLID_COUNTER++;
+
+				if ( m_solidBlocks[ index - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )	//left bottom
+					SOLID_COUNTER++;
+			}
+
+			if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) )
+			{
+				if ( m_solidBlocks[ index + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) //top
+					SOLID_COUNTER++;
+
+				if ( m_solidBlocks[ index - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )	//left top
+					SOLID_COUNTER++;
+			}
+
+		}
+
+		if ( x < ( ConstantParameters::BLOCKS_X_AXIS - 1 ) )	//right
+		{
+			if ( m_solidBlocks[ index + 1 ].m_isSolid )	//right
+				SOLID_COUNTER++;
+
+			if ( y > 0 )	//bottom right
+			{
+				if ( m_solidBlocks[ index + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )
+					SOLID_COUNTER++;
+			}
+
+			if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) )	//above right
+			{
+				if ( m_solidBlocks[ index + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )
+					SOLID_COUNTER++;
+			}
+		}
+
+		if ( SOLID_COUNTER == ConstantParameters::PRODUCE_LIFE_THRESHOLD_3D )
+		{
+			m_temporaryCellularVector[index].m_isSolid = true;
+		} 
+		else if ( ( SOLID_COUNTER <= ConstantParameters::REMOVE_LIFE_THRESHOLD_LOWERBOUND_3D ) || ( SOLID_COUNTER >= ConstantParameters::REMOVE_LIFE_THRESHOLD_UPPERBOUND_3D ) ) {
+			m_temporaryCellularVector[index].m_isSolid = false;
+		}
+		else {
+			m_temporaryCellularVector[index].m_isSolid = m_solidBlocks[index].m_isSolid;
+		}
+
+		SOLID_COUNTER = 0;
 	}
+
+	for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++)
+	{
+		m_solidBlocks[index] = m_temporaryCellularVector[index];
+
+		if ( m_solidBlocks[index].m_isSolid )
+		{
+			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
+			y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+			z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
+			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
+		}
+	}
+
+	m_renderer.PushCubeVerticesToVBO();
 }
