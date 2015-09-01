@@ -52,6 +52,8 @@ public:
 	float m_textureY;
 
 	bool m_is2DWorld;
+
+	double m_lastCellularAutomataTime;
 };
 
 #endif //included_World

@@ -26,7 +26,7 @@ namespace ConstantParameters
 	const unsigned int WIDTH_TIMES_DEPTH = BLOCKS_X_AXIS * BLOCKS_Z_AXIS;
 	const unsigned int TOTAL_BLOCKS_IN_ZONE = BLOCKS_X_AXIS * BLOCKS_Y_AXIS * BLOCKS_Z_AXIS;
 	const unsigned int SOLID_BLOCK_PERCENTAGE_2D = 50;
-	const unsigned int SOLID_BLOCK_PERCENTAGE_3D = 10;
+	const unsigned int SOLID_BLOCK_PERCENTAGE_3D = 15;
 
 //2D checks 8 Cubes
 	const unsigned int PRODUCE_LIFE_THRESHOLD_2D = 3;
@@ -34,9 +34,12 @@ namespace ConstantParameters
 	const unsigned int REMOVE_LIFE_THRESHOLD_LOWERBOUND_2D = 1;
 
 //3D checks 26 Cubes
-	const unsigned int PRODUCE_LIFE_THRESHOLD_3D = 3;
-	const unsigned int REMOVE_LIFE_THRESHOLD_UPPERBOUND_3D = 4;
-	const unsigned int REMOVE_LIFE_THRESHOLD_LOWERBOUND_3D = 1;
+	const unsigned int PRODUCE_LIFE_THRESHOLD_LOWERBOUND_3D = 9;
+	const unsigned int PRODUCE_LIFE_THRESHOLD_UPPERBOUND_3D = 10;
+	const unsigned int REMOVE_LIFE_THRESHOLD_UPPERBOUND_3D = 12;
+	const unsigned int REMOVE_LIFE_THRESHOLD_LOWERBOUND_3D = 3;
+
+	const unsigned double TIME_BETWEEN_CA_STEPS = 1.0;
 }
 
 #endif //included_Constants

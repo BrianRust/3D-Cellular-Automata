@@ -6,6 +6,7 @@ World::World(  )
 	: m_mousePositionXDifference(0.f)
 	, m_mousePositionZDifference(0.f)
 	, m_is2DWorld(false)
+	, m_lastCellularAutomataTime(0.0)
 {
 	srand ((unsigned int)(time(NULL)));
 
@@ -391,6 +392,7 @@ void World::CheckForGimbleLock()
 //----------------------------------------------------
 void World::Update()
 {
+	float currentTime = Time::GetCurrentTimeSeconds();
 	float deltaSeconds = ConstantParameters::DELTA_SECONDS; // Hack: assume 60 FPS
 	//	GetCursorPos()
 	UpdatePlayerFromInput( deltaSeconds );
@@ -401,8 +403,12 @@ void World::Update()
 		m_renderer.DeleteBuffers();
 		GameOfLifeCellularAutomataPass2D();
 	} else {
-		m_renderer.DeleteBuffers();
-		GameOfLifeCellularAutomataPass3D();
+		if ( ( currentTime - m_lastCellularAutomataTime ) > ConstantParameters::TIME_BETWEEN_CA_STEPS )
+		{
+			m_lastCellularAutomataTime = currentTime;
+			m_renderer.DeleteBuffers();
+			GameOfLifeCellularAutomataPass3D();
+		}
 	}
 }
 
@@ -659,7 +665,7 @@ void World::GameOfLifeCellularAutomataPass3D()
 			}
 		}
 
-		if ( SOLID_COUNTER == ConstantParameters::PRODUCE_LIFE_THRESHOLD_3D )
+		if ( ( SOLID_COUNTER > ( ConstantParameters::PRODUCE_LIFE_THRESHOLD_LOWERBOUND_3D - 1 ) ) && ( SOLID_COUNTER < ( ConstantParameters::PRODUCE_LIFE_THRESHOLD_UPPERBOUND_3D + 1 ) ) )
 		{
 			m_temporaryCellularVector[index].m_isSolid = true;
 		} 
