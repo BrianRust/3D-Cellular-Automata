@@ -27,15 +27,13 @@ PFNGLACTIVETEXTUREPROC glActiveTexture = nullptr;
 PFNGLUNIFORM3FVPROC glUniform3fv = nullptr;
 
 //----------------------------------
-OpenGLRenderer::OpenGLRenderer()
-{
+OpenGLRenderer::OpenGLRenderer() {
 	m_blockVBOid = 0;
 	m_wireframeVBOid = 0;
 }
 
 //----------------------------------
-int OpenGLRenderer::CreateVertexShader(const char* Filename)
-{
+int OpenGLRenderer::CreateVertexShader(const char* Filename) {
 	int length = 0;
 	FILE * shaderFile;
 	long sizeOfFile;
@@ -43,8 +41,7 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename)
 	GLint wasSuccessful;
 	GLint shaderID;
 	shaderFile = fopen ( Filename,"rb");
-	if (shaderFile==NULL)
-	{
+	if (shaderFile==NULL) {
 		int filePathLength = strlen(Filename);
 		char* errorLength = "File Not Found";
 		char* errorMessage = new char[filePathLength + strlen(errorLength) + 2];
@@ -55,8 +52,7 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename)
 		//delete[] errorMessage;
 		std::exit(0);
 	}
-	else
-	{
+	else {
 		fseek (shaderFile, 0, SEEK_END);
 		sizeOfFile = ftell(shaderFile);
 		shaderText = new GLchar[sizeOfFile+1];
@@ -71,8 +67,7 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename)
 	glCompileShader( shaderID );
 	glGetShaderiv( shaderID, GL_COMPILE_STATUS, &wasSuccessful );
 	delete[] shaderText;
-	if ( wasSuccessful != GL_TRUE )
-	{
+	if ( wasSuccessful != GL_TRUE ) {
 		int errorCounter = 0;
 		GLint infoLogLength;
 		glGetShaderiv( shaderID, GL_INFO_LOG_LENGTH, &infoLogLength );
@@ -80,10 +75,8 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename)
 		glGetShaderInfoLog( shaderID, infoLogLength, NULL, infoLogText );
 		int filePathLength = strlen(Filename);
 
-		for (int index = 0; index < infoLogLength+1; index++)
-		{
-			if (infoLogText[index] == '\n')
-			{
+		for (int index = 0; index < infoLogLength+1; index++) {
+			if (infoLogText[index] == '\n') {
 				errorCounter++;
 			}
 		}
@@ -94,8 +87,7 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename)
 
 		std::string infoLogString( infoLogText );
 
-		for (int index = 0; index < errorCounter; index++)
-		{
+		for (int index = 0; index < errorCounter; index++) {
 			infoLogString.replace(infoLogString.find("0("), 2, replaceText);
 		}
 
@@ -114,8 +106,7 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename)
 }
 
 //----------------------------------
-int OpenGLRenderer::CreateFragmentShader(const char* Filename)
-{
+int OpenGLRenderer::CreateFragmentShader(const char* Filename) {
 	int length = 0;
 	FILE * shaderFile;
 	long sizeOfFile;
@@ -123,13 +114,11 @@ int OpenGLRenderer::CreateFragmentShader(const char* Filename)
 	GLint wasSuccessful;
 	GLint shaderID;
 	shaderFile = fopen ( Filename,"rb");
-	if (shaderFile==NULL)
-	{
+	if (shaderFile==NULL) {
 		int test = MessageBoxA(NULL, Filename, "File Not Found", MB_OK | MB_TOPMOST);
 		std::exit(0);
 	}
-	else
-	{
+	else {
 		fseek (shaderFile, 0, SEEK_END);
 		sizeOfFile = ftell(shaderFile);
 		shaderText = new GLchar[sizeOfFile+1];
@@ -145,8 +134,7 @@ int OpenGLRenderer::CreateFragmentShader(const char* Filename)
 
 	glGetShaderiv( shaderID, GL_COMPILE_STATUS, &wasSuccessful );
 	delete[] shaderText;
-	if ( wasSuccessful != GL_TRUE )
-	{
+	if ( wasSuccessful != GL_TRUE ) {
 		int errorCounter = 0;
 		GLint infoLogLength;
 		glGetShaderiv( shaderID, GL_INFO_LOG_LENGTH, &infoLogLength );
@@ -154,10 +142,8 @@ int OpenGLRenderer::CreateFragmentShader(const char* Filename)
 		glGetShaderInfoLog( shaderID, infoLogLength, NULL, infoLogText );
 		int filePathLength = strlen(Filename);
 
-		for (int index = 0; index < infoLogLength+1; index++)
-		{
-			if (infoLogText[index] == '\n')
-			{
+		for (int index = 0; index < infoLogLength+1; index++) {
+			if (infoLogText[index] == '\n') {
 				errorCounter++;
 			}
 		}
@@ -168,8 +154,7 @@ int OpenGLRenderer::CreateFragmentShader(const char* Filename)
 
 		std::string infoLogString( infoLogText );
 
-		for (int index = 0; index < errorCounter; index++)
-		{
+		for (int index = 0; index < errorCounter; index++) {
 			infoLogString.replace(infoLogString.find("0("), 2, replaceText);
 		}
 
@@ -188,16 +173,14 @@ int OpenGLRenderer::CreateFragmentShader(const char* Filename)
 }
 
 //----------------------------------
-int OpenGLRenderer::CreateShaderProgram(GLint vertexShaderID, GLint fragmentShaderID)
-{
+int OpenGLRenderer::CreateShaderProgram(GLint vertexShaderID, GLint fragmentShaderID) {
 	GLint wasSuccessful;
 	GLint shaderProgramID = glCreateProgram();
 	glAttachShader( shaderProgramID, vertexShaderID );
 	glAttachShader( shaderProgramID, fragmentShaderID );
 	glLinkProgram( shaderProgramID );
 	glGetProgramiv( shaderProgramID ,GL_LINK_STATUS, &wasSuccessful);
-	if (wasSuccessful != GL_TRUE)
-	{
+	if (wasSuccessful != GL_TRUE) {
 		GLint infoLogLength;
 		glGetProgramiv( shaderProgramID, GL_INFO_LOG_LENGTH, &infoLogLength );
 		char* infoLogText = new char[ infoLogLength + 1 ];
@@ -212,8 +195,7 @@ int OpenGLRenderer::CreateShaderProgram(GLint vertexShaderID, GLint fragmentShad
 }
 
 //----------------------------------
-void OpenGLRenderer::Initialize()
-{
+void OpenGLRenderer::Initialize() {
 	glGenBuffers = (PFNGLGENBUFFERSPROC) wglGetProcAddress( "glGenBuffers" );
 	glBindBuffer = (PFNGLBINDBUFFERPROC) wglGetProcAddress( "glBindBuffer" );
 	glBufferData = (PFNGLBUFFERDATAPROC) wglGetProcAddress( "glBufferData" );
@@ -255,8 +237,7 @@ void OpenGLRenderer::Initialize()
 }
 
 //-----------------------------------------------------------------------------------------------
-void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition, const RGBA& color )
-{
+void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition, const RGBA& color ) {
 	//const int NUM_VERTS_PER_BLOCK = 24;
 	//m_blockVertices.clear();
 	//m_blockVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK );
@@ -332,70 +313,69 @@ void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition, const RGBA& co
 	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
 
 
-// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 
-// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 
-// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f , minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 
-// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 
-// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 
-// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
-// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+
+	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+
+	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+
+	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+
+	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+
+	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f , minPosition.z + 1.f);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+
+	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+
+	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+
+	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+
+	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+
+	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+
+	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
+	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
 }
 
 //---------------------
-void OpenGLRenderer::SendViewMatrix( Camera myCamera )
-{
+void OpenGLRenderer::SendViewMatrix( Camera myCamera ) {
 	glDisable(GL_TEXTURE_2D);
 	glPushMatrix();
 	gluPerspective(50.0, (16.f/9.f), 0.1, 1000.0);
@@ -412,25 +392,21 @@ void OpenGLRenderer::SendViewMatrix( Camera myCamera )
 	glUniform3fv(m_cameraPosition, 1, &myCamera.m_cameraPosition.x);
 }
 
-void OpenGLRenderer::PopMatrix()
-{
+void OpenGLRenderer::PopMatrix() {
 	glPopMatrix();
 }
 
-void OpenGLRenderer::PushCubeVerticesToVBO()
-{
+void OpenGLRenderer::PushCubeVerticesToVBO() {
 	glBindBuffer(GL_ARRAY_BUFFER, m_blockVBOid);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*m_blockVertices.size(),&m_blockVertices.front(),GL_STATIC_DRAW);
 }
 
-void OpenGLRenderer::PushGridOutlineVerticesToVBO()
-{
+void OpenGLRenderer::PushGridOutlineVerticesToVBO() {
 	glBindBuffer(GL_ARRAY_BUFFER, m_wireframeVBOid);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*m_wireframeVertices.size(),&m_wireframeVertices.front(),GL_STATIC_DRAW);
 }
 
-void OpenGLRenderer::SendCubeVBO()
-{
+void OpenGLRenderer::SendCubeVBO() {
 	float timeNow = (float)Time::GetCurrentTimeSeconds();
 	GLint uniformloc;
 	
@@ -455,22 +431,21 @@ void OpenGLRenderer::SendCubeVBO()
 	glDisableClientState(GL_NORMAL_ARRAY);
 
 	//wireframe
-// 	glBindBuffer(GL_ARRAY_BUFFER, m_wireframeVBOid);
-// 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
-// 	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, color)); 
-// 	glEnableClientState(GL_VERTEX_ARRAY);
-// 	glEnableClientState(GL_COLOR_ARRAY);
-// 
-// 	glDrawArrays(GL_LINES, 0, m_wireframeVertices.size());
-// 	glDisableClientState(GL_VERTEX_ARRAY);
-// 	glDisableClientState(GL_COLOR_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, m_wireframeVBOid);
+	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
+	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, color)); 
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	glDrawArrays(GL_LINES, 0, m_wireframeVertices.size());
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
 }
 
-void OpenGLRenderer::DeleteBuffers()
-{
+void OpenGLRenderer::DeleteBuffers() {
 	//glDeleteBuffers(1, &m_blockVBOid);
 	m_blockVertices.clear();
 
 	//glDeleteBuffers(1, &m_wireframeVBOid);
-	//m_wireframeVertices.clear();
+	m_wireframeVertices.clear();
 }
