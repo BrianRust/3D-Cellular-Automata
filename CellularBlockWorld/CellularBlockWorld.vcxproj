@@ -93,7 +93,6 @@
     <ClInclude Include="Engine\Math\Vertex.hpp" />
     <ClInclude Include="Engine\Renderer\glext.h" />
     <ClInclude Include="Engine\Renderer\OpenGLRenderer.hpp" />
-    <ClInclude Include="Engine\Renderer\Vertex.hpp" />
     <ClInclude Include="Engine\Time\Time.hpp" />
     <ClInclude Include="Game\CubeCell.hpp" />
     <ClInclude Include="Game\World.hpp" />

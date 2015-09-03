@@ -7,8 +7,7 @@ class RGBA
 {
 public:
 	RGBA(){};
-	RGBA(float InitialR, float InitialG, float InitialB, float InitialA)
-	{
+	RGBA(float InitialR, float InitialG, float InitialB, float InitialA) {
 		r = InitialR;
 		g = InitialG;
 		b = InitialB;

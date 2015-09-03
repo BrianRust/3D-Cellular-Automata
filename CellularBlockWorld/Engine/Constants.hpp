@@ -48,12 +48,12 @@ namespace ConstantParameters
 
 	const unsigned double TIME_BETWEEN_CA_STEPS = 0.5;
 
-	/*
-	const unsigned int PRODUCE_LIFE_THRESHOLD_LOWERBOUND_3D = 5;
-	const unsigned int PRODUCE_LIFE_THRESHOLD_UPPERBOUND_3D = 5;
-	const unsigned int REMOVE_LIFE_THRESHOLD_UPPERBOUND_3D = 8;
-	const unsigned int REMOVE_LIFE_THRESHOLD_LOWERBOUND_3D = 1;
-	*/
+	
+// 	const unsigned int PRODUCE_LIFE_THRESHOLD_LOWERBOUND_3D = 5;
+// 	const unsigned int PRODUCE_LIFE_THRESHOLD_UPPERBOUND_3D = 5;
+// 	const unsigned int REMOVE_LIFE_THRESHOLD_UPPERBOUND_3D = 8;
+// 	const unsigned int REMOVE_LIFE_THRESHOLD_LOWERBOUND_3D = 1;
+	
 }
 
 #endif //included_Constants

@@ -7,8 +7,7 @@ class Vector4
 {
 public:
 	Vector4(){};
-	Vector4(float InitialX, float InitialY, float InitialZ, float InitialW)
-	{
+	Vector4(float InitialX, float InitialY, float InitialZ, float InitialW) {
 		x = InitialX;
 		y = InitialY;
 		z = InitialZ;

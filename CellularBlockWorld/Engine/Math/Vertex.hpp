@@ -18,23 +18,20 @@
 class Vertex
 {
 public:
-	Vertex()
-	{
+	Vertex() {
 		vertexPosition = Vector3(0.f, 0.f, 0.f);
 		color = RGBA(0.f, 0.f, 0.f, 1.f);
 		normal = Vector3(1.f, 0.f, 0.f);
 //		texCoordinates = Vector2(0.f, 0.f);
 	};
-	Vertex(const Vector3& InitialPosition, const RGBA& InitialColor, const Vector2& InitialUVCoordinates)
-	{
+	Vertex(const Vector3& InitialPosition, const RGBA& InitialColor, const Vector2& InitialUVCoordinates) {
 		vertexPosition = InitialPosition;
 		color = InitialColor;
 //		texCoordinates = InitialUVCoordinates;
 		normal = Vector3(1.f, 0.f, 0.f);
 	}
 
-	Vertex(const Vector3& InitialPosition, const RGBA& InitialColor, const Vector2& InitialUVCoordinates, const Vector3& initialNormal)
-	{
+	Vertex(const Vector3& InitialPosition, const RGBA& InitialColor, const Vector2& InitialUVCoordinates, const Vector3& initialNormal) {
 		vertexPosition = InitialPosition;
 		color = InitialColor;
 //		texCoordinates = InitialUVCoordinates;

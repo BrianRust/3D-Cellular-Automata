@@ -48,9 +48,6 @@
     <ClInclude Include="Engine\Renderer\OpenGLRenderer.hpp">
       <Filter>Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Renderer\Vertex.hpp">
-      <Filter>Engine\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Time\Time.hpp">
       <Filter>Engine\Time</Filter>
     </ClInclude>

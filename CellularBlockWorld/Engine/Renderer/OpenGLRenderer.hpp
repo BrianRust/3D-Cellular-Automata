@@ -9,7 +9,7 @@
 #include <gl/glu.h>
 #include "glext.h"
 #include "../Math/MyMathFiles.hpp"
-#include "Vertex.hpp"
+#include "../Math/Vertex.hpp"
 #include "../Constants.hpp"
 #include "../Camera/Camera.hpp"
 #include "../Time/Time.hpp"

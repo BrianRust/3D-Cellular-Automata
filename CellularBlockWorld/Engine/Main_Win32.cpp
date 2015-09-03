@@ -39,88 +39,78 @@ HGLRC g_openGLRenderingContext = nullptr;
 const char* APP_NAME = "Win32 OpenGL Minimum Test App";
 
 //-----------------------------------------------------------------------------------------------
-void moveInCameraFacingDirection()
-{
+void moveInCameraFacingDirection() {
 	g_myCamera.m_cameraPosition.x += 0.1f * sin(g_myCamera.m_cameraPitch);
 	g_myCamera.m_cameraPosition.y += 0.1f * -sin(g_myCamera.m_cameraRoll);
 	g_myCamera.m_cameraPosition.z += 0.1f * -cos(g_myCamera.m_cameraPitch);
 }
 
 //-----------------------------------------------------------------------------------------------
-void moveOppositeOfCameraFacingDirection()
-{
+void moveOppositeOfCameraFacingDirection() {
 	g_myCamera.m_cameraPosition.x += 0.1f * sin(g_myCamera.m_cameraPitch);
 	g_myCamera.m_cameraPosition.y -= 0.1f * -sin(g_myCamera.m_cameraRoll);
 	g_myCamera.m_cameraPosition.z += 0.1f * cos(g_myCamera.m_cameraPitch);
 }
 
 //-----------------------------------------------------------------------------------------------
-LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMessageCode, WPARAM wParam, LPARAM lParam )
-{
-	switch( wmMessageCode )
-	{
-	case WM_CLOSE:
-	case WM_DESTROY:
-	case WM_QUIT:
-		g_isQuitting = true;
-		return 0;
+LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMessageCode, WPARAM wParam, LPARAM lParam ) {
+	switch( wmMessageCode ) {
+		case WM_CLOSE:
+		case WM_DESTROY:
+		case WM_QUIT:
+			g_isQuitting = true;
+			return 0;
 
-	case WM_KEYDOWN:
-		{
-			unsigned char asKey = (unsigned char) wParam;
-			if ( asKey == VK_ESCAPE )
+		case WM_KEYDOWN:
 			{
-				g_isQuitting = true;
-				return 0;
+				unsigned char asKey = (unsigned char) wParam;
+				if ( asKey == VK_ESCAPE ) {
+					g_isQuitting = true;
+					return 0;
+				}
+
+				bool wasProcessed = g_theWorld.ProcessKeyDownEvent( asKey );
+				if ( wasProcessed ) {
+					return 0;
+				}
+
+				break;
+
 			}
 
-			bool wasProcessed = g_theWorld.ProcessKeyDownEvent( asKey );
-			if ( wasProcessed )
+		case WM_KEYUP:
 			{
-				return 0;
-			}
 
-			break;
+				unsigned char asKey = (unsigned char) wParam;
+				bool wasProcessed = g_theWorld.ProcessKeyUpEvent( asKey );
+				if ( wasProcessed ) {
+					return 0;
+				}
 
-		}
-
-	case WM_KEYUP:
-		{
-
-			unsigned char asKey = (unsigned char) wParam;
-			bool wasProcessed = g_theWorld.ProcessKeyUpEvent( asKey );
-			if ( wasProcessed )
-			{
-				return 0;
-			}
-
-			break;
-		}
-	
-	case WM_ACTIVATE:
-		{
-			if ( wParam == WA_ACTIVE )
-			{
-				g_windowHasFocus = true;
 				break;
 			}
-			else if ( wParam == WA_INACTIVE)
+		
+		case WM_ACTIVATE:
+			{
+				if ( wParam == WA_ACTIVE ) {
+					g_windowHasFocus = true;
+					break;
+				}
+				else if ( wParam == WA_INACTIVE) {
+					g_windowHasFocus = false;
+					break;
+				}
+				else if ( wParam == WA_CLICKACTIVE ) {
+					g_windowHasFocus = true;
+					break;
+				}
+			}
+
+		case WM_KILLFOCUS:
 			{
 				g_windowHasFocus = false;
 				break;
 			}
-			else if ( wParam == WA_CLICKACTIVE )
-			{
-				g_windowHasFocus = true;
-				break;
-			}
-		}
-
-	case WM_KILLFOCUS:
-		{
-			g_windowHasFocus = false;
-			break;
-		}
 	}
 
 // 	if ( wParam == WA_ACTIVE )
@@ -129,19 +119,16 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 // 	if ( wParam == WA_INACTIVE )
 // 		g_windowHasFocus = false;
 
-	if ( g_windowHasFocus )
-	{
+	if ( g_windowHasFocus ) {
 		POINT cursorPosition;
 		BOOL cursorPositionResult = GetCursorPos(&cursorPosition);
 
-		if (cursorPositionResult)
-		{
+		if (cursorPositionResult) {
 			g_theWorld.m_mousePositionXDifference = (float)(HALF_SCREEN_WIDTH - cursorPosition.x);
 			g_theWorld.m_mousePositionZDifference = (float)(HALF_SCREEN_HEIGHT- cursorPosition.y);
 		}
 	}
-	else
-	{
+	else {
 		g_theWorld.m_mousePositionXDifference = 0.f;
 		g_theWorld.m_mousePositionZDifference = 0.f;
 	}
@@ -151,8 +138,7 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 
 
 //-----------------------------------------------------------------------------------------------
-void CreateOpenGLWindow( HINSTANCE applicationInstanceHandle )
-{
+void CreateOpenGLWindow( HINSTANCE applicationInstanceHandle ) {
 	// Define a window class
 	WNDCLASSEX windowClassDescription;
 	memset( &windowClassDescription, 0, sizeof( windowClassDescription ) );
@@ -231,14 +217,11 @@ void CreateOpenGLWindow( HINSTANCE applicationInstanceHandle )
 
 
 //-----------------------------------------------------------------------------------------------
-void RunMessagePump()
-{
+void RunMessagePump() {
 	MSG queuedMessage;
-	for ( ;; )
-	{
+	for ( ;; ) {
 		const BOOL wasMessagePresent = PeekMessage( &queuedMessage, NULL, 0, 0, PM_REMOVE );
-		if ( !wasMessagePresent )
-		{
+		if ( !wasMessagePresent ) {
 			break;
 		}
 
@@ -248,43 +231,35 @@ void RunMessagePump()
 }
 
 //-----------------------------------------------------------------------------------------------
-void Update()
-{
+void Update() {
 	g_theWorld.Update();
-	if (g_windowHasFocus)
+	if (g_windowHasFocus) {
 		SetCursorPos(HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT);
+	}
 }
 
 //-----------------------------------------------------------------------------------------------
-void Render()
-{
-
+void Render() {
 	glClearColor( 0.5f, 0.5f, 0.5f, 1.f );
 	glClearDepth(1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-
 	g_theWorld.Render();
 }
 
 //-----------------------------------------------------------------------------------------------
-void WaitUntilNextFrameTime()
-{
+void WaitUntilNextFrameTime() {
 	static double timeAtLastUpdate = Time::GetCurrentTimeSeconds();
 
 	double timeNow = Time::GetCurrentTimeSeconds();
 	static double targetTime = timeNow;
-	while ( timeNow < targetTime )
-	{
+	while ( timeNow < targetTime ) {
 		timeNow = Time::GetCurrentTimeSeconds();
 	}
 	targetTime = timeNow + FRAMETIME;
 }
 
 //-----------------------------------------------------------------------------------------------
-void RunFrame()
-{
+void RunFrame() {
 	RunMessagePump();
 	Update();
 	Render();
@@ -294,8 +269,7 @@ void RunFrame()
 
 
 //-----------------------------------------------------------------------------------------------
-int WINAPI WinMain( HINSTANCE applicationInstanceHandle, HINSTANCE, LPSTR commandLineString, int )
-{
+int WINAPI WinMain( HINSTANCE applicationInstanceHandle, HINSTANCE, LPSTR commandLineString, int ) {
 	UNUSED( commandLineString );
 	g_windowHasFocus = true;
 	CreateOpenGLWindow( applicationInstanceHandle );
@@ -303,8 +277,7 @@ int WINAPI WinMain( HINSTANCE applicationInstanceHandle, HINSTANCE, LPSTR comman
 	g_theWorld.Initialize();
 	SetCursorPos(HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT);
 	ShowCursor(false);
-	while ( !g_isQuitting )	
-	{
+	while ( !g_isQuitting ) {
 		RunFrame();
 	}
 	ShowCursor(true);

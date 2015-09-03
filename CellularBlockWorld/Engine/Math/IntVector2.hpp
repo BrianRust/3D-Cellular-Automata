@@ -7,8 +7,7 @@ class IntVector2
 {
 public:
 	IntVector2(){};
-	IntVector2(int InitialX, int InitialY)
-	{
+	IntVector2(int InitialX, int InitialY) {
 		x = InitialX;
 		y = InitialY;
 	};
@@ -16,54 +15,41 @@ public:
 	int y;
 };
 
-inline bool operator == (const IntVector2& lhs, const IntVector2& rhs)
-{
-	if (lhs.y == rhs.y)
-	{
-		if (lhs.x == rhs.x)
-		{
+inline bool operator == (const IntVector2& lhs, const IntVector2& rhs) {
+	if (lhs.y == rhs.y) {
+		if (lhs.x == rhs.x) {
 			return true;
 		}
-		else
-		{
+		else {
 			return false;
 		}
 	}
-	else
-	{
+	else {
 		return false;
 	}
 }
 
-inline IntVector2 operator - (const IntVector2& first, const IntVector2& second)
-{
+inline IntVector2 operator - (const IntVector2& first, const IntVector2& second) {
 	IntVector2 result;
 	result.x = first.x - second.x;
 	result.y = first.y - second.y;
 	return result;
 };
 
-inline bool operator < (const IntVector2& lhs, const IntVector2& rhs)
-{
-	if (lhs.y == rhs.y)
-	{
-		if (lhs.x < rhs.x)
-		{
+inline bool operator < (const IntVector2& lhs, const IntVector2& rhs) {
+	if (lhs.y == rhs.y) {
+		if (lhs.x < rhs.x) {
 			return true;
 		}
-		else
-		{
+		else {
 			return false;
 		}
 	}
-	else
-	{
-		if (lhs.y < rhs.y)
-		{
+	else {
+		if (lhs.y < rhs.y) {
 			return true;
 		}
-		else
-		{
+		else {
 			return false;
 		}
 	}
