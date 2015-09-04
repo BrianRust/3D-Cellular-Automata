@@ -29,6 +29,8 @@ public:
 	void PopMatrix();
 	void SendCubeVBO();
 
+	void DrawTargetCellOutline(Vector3 startPosition);
+
 	void DeleteBuffers();
 
 	int CreateVertexShader(const char* Filename);

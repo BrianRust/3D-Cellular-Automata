@@ -12,10 +12,14 @@ namespace ConstantParameters
 	const float CONVERTING_TO_RADIANS = PI/180.f;
 	const float CONVERTING_TO_DEGREES = 180.f/PI;
 	const float DELTA_SECONDS = 1/60.f;
-	const float CAMERA_SPEED = 5.f;
+	const float CAMERA_SPEED = 10.f;
 	const float MOUSE_SPEED = 0.2f;
 	const float CAMERA_Z_MAX = PI/2;
-	const float TEXTURE_MAX = 0.03125f;
+
+	const float BLOCK_HIGHLIGHT_RANGE = 91.f;
+	const float NUMBER_OF_STEPS_IN_STEP_AND_SAMPLE = 1000.f;
+	const float NUMBER_OF_STEPS_IN_STEP_AND_SAMPLE_INVERSE = 1.f/NUMBER_OF_STEPS_IN_STEP_AND_SAMPLE;
+
  	const unsigned int BLOCKS_X_AXIS = 64;
  	const unsigned int BLOCKS_Y_AXIS = 64;
  	const unsigned int BLOCKS_Z_AXIS = 64;

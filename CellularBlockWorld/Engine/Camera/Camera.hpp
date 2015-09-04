@@ -12,6 +12,7 @@ public:
 	Camera();
 
 	Vector3 m_cameraPosition;
+	Vector3 m_cameraFacingVector;
 	//Vector3 m_cameraOrientation; //Roll, Pitch, Yaw
 
 	float m_cameraRoll;

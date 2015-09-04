@@ -6,8 +6,9 @@ World::World(  )
 	: m_mousePositionXDifference(0.f)
 	, m_mousePositionZDifference(0.f)
 	, m_is2DWorld(false)
-	, m_isPaused(false)
+	, m_isPaused(true)
 	, m_lastCellularAutomataTime(0.0)
+	, m_cellFocusRange(0)
 {
 	srand ((unsigned int)(time(NULL)));
 
@@ -267,6 +268,13 @@ void World::UpdateCameraFromInput( float deltaSeconds ) {
 }
 
 //----------------------------------------------------
+void World::FindCameraFacingVector() {
+	m_camera.m_cameraFacingVector.x = cos(m_camera.m_cameraYaw) * cos(m_camera.m_cameraPitch);
+	m_camera.m_cameraFacingVector.y = sin(m_camera.m_cameraYaw) * cos(m_camera.m_cameraPitch);
+	m_camera.m_cameraFacingVector.z = -sin(m_camera.m_cameraPitch);
+}
+
+//----------------------------------------------------
 void World::UpdatePlayerFromInput( float deltaSeconds ) {	
 	if ( m_isKeyDown[ 'P' ] && !m_keyIsHeld ) {
 		m_keyIsHeld = true;
@@ -360,6 +368,7 @@ void World::Update() {
 	//	GetCursorPos()
 	UpdatePlayerFromInput( deltaSeconds );
 	UpdateCameraFromInput( deltaSeconds );
+	FindCameraFacingVector();
 	CheckForGimbleLock();
 
 	if (!m_isPaused) {
@@ -374,12 +383,29 @@ void World::Update() {
 			}
 		}
 	}
+
+	GetAllCellsInRayTrace();
+	CapFocus();
 }
 
 //----------------------------------------------------
 void World::Render() {	
+	unsigned int x = 0;
+	unsigned int y = 0;
+	unsigned int z = 0;
+
 	m_renderer.SendViewMatrix(m_camera);
 	m_renderer.SendCubeVBO();
+
+	//for (int index = 0; index < m_raytraceCells.size(); index++) {
+	if ( !m_raytraceCells.empty() ) {
+		x = m_raytraceCells[m_cellFocusRange] & ConstantParameters::BLOCKS_X_AXIS - 1;
+		y = (m_raytraceCells[m_cellFocusRange] >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+		z = (m_raytraceCells[m_cellFocusRange] >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+
+		m_renderer.DrawTargetCellOutline(Vector3(x, y, z));
+	}
+
 	m_renderer.PopMatrix();
 }
 
@@ -654,3 +680,80 @@ void World::GameOfLifeCellularAutomataPass3D() {
 	m_renderer.PushCubeVerticesToVBO();
 	m_renderer.PushGridOutlineVerticesToVBO();
 }
+
+//---------------------------------------------
+void World::GetAllCellsInRayTrace() {
+	m_raytraceCells.clear();
+
+	bool foundBlock = false;
+
+	float xPos = 0.f;
+	float yPos = 0.f;
+	float zPos = 0.f;
+	float range = 0.f;
+	for (float counter = 0.f; counter <= ConstantParameters::NUMBER_OF_STEPS_IN_STEP_AND_SAMPLE; counter += 1.f){
+		range = ConstantParameters::BLOCK_HIGHLIGHT_RANGE * counter*ConstantParameters::NUMBER_OF_STEPS_IN_STEP_AND_SAMPLE_INVERSE;
+		xPos = m_camera.m_cameraPosition.x + (m_camera.m_cameraFacingVector.x * range);
+		yPos = m_camera.m_cameraPosition.y + (m_camera.m_cameraFacingVector.y * range);
+		zPos = m_camera.m_cameraPosition.z + (m_camera.m_cameraFacingVector.z * range);
+
+		if ( ( (xPos < ConstantParameters::BLOCKS_X_AXIS) && ( xPos >= 0.f ) ) && 
+			( (yPos < ConstantParameters::BLOCKS_Y_AXIS) && ( yPos >= 0.f ) ) && 
+			( (zPos < ConstantParameters::BLOCKS_Z_AXIS) && ( zPos >= 0.f ) ) )
+		{
+			int x = xPos;
+			int y = yPos;
+			int z = zPos;
+
+			int index = ( x + ( y * ConstantParameters::BLOCKS_Y_AXIS ) + ( z * ConstantParameters::BLOCKS_X_AXIS * ConstantParameters::BLOCKS_Y_AXIS ) );
+
+			if ( !m_raytraceCells.empty() ) {
+				for (int counter = 0; counter < m_raytraceCells.size(); counter++) {
+					if ( m_raytraceCells[counter] == index ) {
+						foundBlock = true;
+						break;
+					}
+				}
+
+				if (!foundBlock) {
+					m_raytraceCells.push_back( index );
+				}
+			} else {
+				m_raytraceCells.push_back( index );
+			}
+		}
+		foundBlock = false;
+	}
+}
+
+//--------------------------------------------
+void World::IncreaseFocus()
+{
+	m_cellFocusRange++;
+	if (m_cellFocusRange >= m_raytraceCells.size() ) {
+		m_cellFocusRange = m_raytraceCells.size() - 1;
+	}
+}
+
+//--------------------------------------------
+void World::ReduceFocus()
+{
+	m_cellFocusRange--;
+	if (m_cellFocusRange < 0) {
+		m_cellFocusRange = 0;
+	}
+}
+
+//--------------------------------------------
+void World::CapFocus()
+{
+	if (m_cellFocusRange >= m_raytraceCells.size() ) {
+		m_cellFocusRange = m_raytraceCells.size() - 1;
+	}
+
+	if (m_cellFocusRange < 0) {
+		m_cellFocusRange = 0;
+	}
+}
+
+

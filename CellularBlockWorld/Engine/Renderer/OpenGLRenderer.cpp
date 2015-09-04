@@ -449,3 +449,51 @@ void OpenGLRenderer::DeleteBuffers() {
 	//glDeleteBuffers(1, &m_wireframeVBOid);
 	m_wireframeVertices.clear();
 }
+
+void OpenGLRenderer::DrawTargetCellOutline(Vector3 startPosition) {
+	RGBA lineColor(1.f, 1.f, 1.f, 1.f);
+	glUseProgram(0);
+	
+	glLineWidth(3.f);
+	glBegin(GL_LINES);
+	{	
+		glColor4f( lineColor.r, lineColor.g, lineColor.b, lineColor.a );
+		glVertex3f(startPosition.x, startPosition.y, startPosition.z);
+		glVertex3f(startPosition.x, startPosition.y + 1.f, startPosition.z);
+
+		glVertex3f(startPosition.x, startPosition.y, startPosition.z);
+		glVertex3f(startPosition.x + 1.f, startPosition.y, startPosition.z);
+
+		glVertex3f(startPosition.x, startPosition.y, startPosition.z);
+		glVertex3f(startPosition.x, startPosition.y, startPosition.z + 1.f);
+
+		glVertex3f(startPosition.x + 1.f, startPosition.y + 1.f, startPosition.z);
+		glVertex3f(startPosition.x, startPosition.y + 1.f, startPosition.z);
+
+		glVertex3f(startPosition.x + 1.f, startPosition.y + 1.f, startPosition.z);
+		glVertex3f(startPosition.x + 1.f, startPosition.y, startPosition.z);
+
+		glVertex3f(startPosition.x + 1.f, startPosition.y + 1.f, startPosition.z);
+		glVertex3f(startPosition.x + 1.f, startPosition.y + 1.f , startPosition.z + 1.f);
+
+		glVertex3f(startPosition.x, startPosition.y + 1.f, startPosition.z + 1.f);
+		glVertex3f(startPosition.x, startPosition.y + 1.f, startPosition.z);
+
+		glVertex3f(startPosition.x, startPosition.y + 1.f, startPosition.z + 1.f);
+		glVertex3f(startPosition.x, startPosition.y, startPosition.z + 1.f);
+
+		glVertex3f(startPosition.x, startPosition.y + 1.f, startPosition.z + 1.f);
+		glVertex3f(startPosition.x + 1.f, startPosition.y + 1.f, startPosition.z + 1.f);
+
+		glVertex3f(startPosition.x + 1.f, startPosition.y, startPosition.z + 1.f);
+		glVertex3f(startPosition.x + 1.f, startPosition.y, startPosition.z);
+
+		glVertex3f(startPosition.x + 1.f, startPosition.y, startPosition.z + 1.f);
+		glVertex3f(startPosition.x + 1.f, startPosition.y + 1.f, startPosition.z + 1.f);
+
+		glVertex3f(startPosition.x + 1.f, startPosition.y, startPosition.z + 1.f);
+		glVertex3f(startPosition.x, startPosition.y, startPosition.z + 1.f);
+	}
+	glEnd();
+	glUseProgram(m_shaderProgramID);
+}

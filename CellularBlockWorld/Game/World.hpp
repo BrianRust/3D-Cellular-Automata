@@ -24,6 +24,7 @@ public:
 	bool ProcessKeyUpEvent( unsigned char virtualKeyCode);
 	void UpdatePlayerFromInput( float deltaseconds );
 	void UpdateCameraFromInput( float deltaseconds );
+	void FindCameraFacingVector();
 	void CheckForGimbleLock();
 	void Initialize();
 	void BuildZone2D();
@@ -34,6 +35,12 @@ public:
 	void GameOfLifeCellularAutomataPass2D();
 	void GameOfLifeCellularAutomataPass3D();
 
+	void IncreaseFocus();
+	void ReduceFocus();
+	void CapFocus();
+
+	void GetAllCellsInRayTrace();
+
 	void Update();
 	void Render();
 
@@ -42,9 +49,12 @@ public:
 	bool m_keyIsHeld;
 
 	std::vector<CubeCell> m_temporaryCellularVector;
+	std::vector<int> m_raytraceCells;
 
 	Camera m_camera;
 	OpenGLRenderer m_renderer;
+
+	int m_cellFocusRange;
 
 	float m_mousePositionXDifference;
 	float m_mousePositionZDifference;
