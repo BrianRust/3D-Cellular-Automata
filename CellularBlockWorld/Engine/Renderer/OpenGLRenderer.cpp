@@ -232,15 +232,16 @@ void OpenGLRenderer::Initialize() {
 
 	isInitializing = true;
 
-	//m_blockVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK );
-	//m_wireframeVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK );
+	const int NUM_VERTS_PER_BLOCK = 24;
+
+	m_blockVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK * ( ConstantParameters::SOLID_BLOCK_PERCENTAGE_3D / 100 ) );
+	m_wireframeVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK * ( ConstantParameters::SOLID_BLOCK_PERCENTAGE_3D / 100 ) );
 }
 
 //-----------------------------------------------------------------------------------------------
 void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition, const RGBA& color ) {
-	//const int NUM_VERTS_PER_BLOCK = 24;
+	const int NUM_VERTS_PER_BLOCK = 24;
 	//m_blockVertices.clear();
-	//m_blockVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK );
 	Vector2 texCoordinate = Vector2(0.f, 0.f);
 	Vector3 newPosition = Vector3(0.f, 0.f, 0.f);
 	Vector3 normal = Vector3(0.f, 0.f, 1.f);

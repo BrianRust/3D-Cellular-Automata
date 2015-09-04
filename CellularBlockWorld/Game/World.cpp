@@ -19,7 +19,7 @@ World::World(  )
 
 void World::Initialize() {
 	for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++) {
-		m_solidBlocks.push_back(CubeCell(false));
+		m_worldBlockCells.push_back(CubeCell(false));
 	}
 	BuildZone3D();
 }
@@ -37,16 +37,16 @@ void World::BuildZone2D() {
 	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_DEPTH; index++) {
 		if ( (rand() % 100) < ConstantParameters::SOLID_BLOCK_PERCENTAGE_2D ) {
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
-			y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-			z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+			y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
-			m_solidBlocks[index] = true;
+			m_worldBlockCells[index] = true;
 			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
 
 			counter++;
 		}
 		else {
-			m_solidBlocks[index] = false;
+			m_worldBlockCells[index] = false;
 		}
 
 		m_temporaryCellularVector.push_back((CubeCell(false)));
@@ -61,23 +61,28 @@ void World::BuildZone3D() {
 	unsigned int y = 0;
 	unsigned int z = 0;
 
+	
+
+	//m_solidBlocks.clear();
+	//m_temporaryCellularVector.clear();
+
 	//m_solidBlocks.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
-	//m_temporaryCellularVector.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
+	m_temporaryCellularVector.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
 
 	int counter = 0;
 
 	for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++) {
 		if ( (rand() % 100) < ConstantParameters::SOLID_BLOCK_PERCENTAGE_3D ) {
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
-			y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-			z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+			y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
-			m_solidBlocks[index] = true;
+			m_worldBlockCells[index] = true;
 			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
 			counter++;
 		}
 		else {
-			m_solidBlocks[index] = false;
+			m_worldBlockCells[index] = false;
 		}
 
 		m_temporaryCellularVector.push_back((CubeCell(false)));
@@ -97,46 +102,46 @@ void World::TestSolidCellularAutomataPass() {
 
 	for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++) {
 		x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
-		y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-		z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+		y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+		z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 		
 		//ABOVE
 		if ( z < ( ConstantParameters::BLOCKS_Z_AXIS - 1 ) ) {
-			if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT ].m_isSolid ) {	//above
+			if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT ].m_isSolid ) {	//above
 				SOLID_COUNTER++;
 			}
 
 			if ( x > 0 ) {	//above left
-				if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 ].m_isSolid ) {	//above left
+				if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 ].m_isSolid ) {	//above left
 					SOLID_COUNTER++;
 				}
 
 				if ( y > 0 ) {	//above left bottom
-					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+					if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 						SOLID_COUNTER++;
 					}
 				}
 				
 				if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {	//above left top
-					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+					if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 						SOLID_COUNTER++;
 					}
 				}
 			}
 
 			if ( x < ( ConstantParameters::BLOCKS_X_AXIS - 1 ) ) {	//above right
-				if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 ].m_isSolid ) {	//above right
+				if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 ].m_isSolid ) {	//above right
 					SOLID_COUNTER++;
 				}
 
 				if ( y > 0 ) {	//above right bottom
-					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+					if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 						SOLID_COUNTER++;
 					}
 				}
 
 				if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {	//above right top
-					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+					if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 						SOLID_COUNTER++;
 					}
 				}
@@ -145,41 +150,41 @@ void World::TestSolidCellularAutomataPass() {
 
 		//BOTTOM
 		if ( z > 0 ) {
-			if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT ].m_isSolid ) {	//above
+			if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT ].m_isSolid ) {	//above
 				SOLID_COUNTER++;
 			}
 
 			if ( x > 0 ) {	//above left
-				if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 ].m_isSolid ) {	//above left
+				if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 ].m_isSolid ) {	//above left
 					SOLID_COUNTER++;
 				}
 
 				if ( y > 0 ) {	//above left bottom
-					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+					if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 						SOLID_COUNTER++;
 					}
 				}
 
 				if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {	//above left top
-					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+					if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 						SOLID_COUNTER++;
 					}
 				}
 			}
 
 			if ( x < ( ConstantParameters::BLOCKS_X_AXIS - 1 ) ) {	//above right
-				if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 ].m_isSolid ) {	//above right
+				if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 ].m_isSolid ) {	//above right
 					SOLID_COUNTER++;
 				}
 
 				if ( y > 0 ) {	//above left bottom
-					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+					if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 						SOLID_COUNTER++;
 					}
 				}
 
 				if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {	//above left top
-					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+					if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 						SOLID_COUNTER++;
 					}
 				}
@@ -188,36 +193,36 @@ void World::TestSolidCellularAutomataPass() {
 
 		//MIDDLE
 		if ( x > 0 ) {	//above left
-			if ( m_solidBlocks[ index - 1 ].m_isSolid ) {	//above left
+			if ( m_worldBlockCells[ index - 1 ].m_isSolid ) {	//above left
 				SOLID_COUNTER++;
 			}
 
 			if ( y > 0 ) {	//above left bottom
-				if ( m_solidBlocks[ index - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+				if ( m_worldBlockCells[ index - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 					SOLID_COUNTER++;
 				}
 			}
 
 			if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {	//above left top
-				if ( m_solidBlocks[ index - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+				if ( m_worldBlockCells[ index - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 					SOLID_COUNTER++;
 				}
 			}
 		}
 
 		if ( x < ( ConstantParameters::BLOCKS_X_AXIS - 1 ) ) {	//above right
-			if ( m_solidBlocks[ index + 1 ].m_isSolid ) {	//above right
+			if ( m_worldBlockCells[ index + 1 ].m_isSolid ) {	//above right
 				SOLID_COUNTER++;
 			}
 
 			if ( y > 0 ) {	//above left bottom
-				if ( m_solidBlocks[ index + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+				if ( m_worldBlockCells[ index + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 					SOLID_COUNTER++;
 				}
 			}
 
 			if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {	//above left top
-				if ( m_solidBlocks[ index + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+				if ( m_worldBlockCells[ index + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 					SOLID_COUNTER++;
 				}
 			}
@@ -234,12 +239,12 @@ void World::TestSolidCellularAutomataPass() {
 	}
 
 	for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++) {
-		m_solidBlocks[index] = m_temporaryCellularVector[index];
+		m_worldBlockCells[index] = m_temporaryCellularVector[index];
 
-		if ( m_solidBlocks[index].m_isSolid ) {
+		if ( m_worldBlockCells[index].m_isSolid ) {
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
-			y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-			z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
+			y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
 			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
 		}
 	}
@@ -400,8 +405,8 @@ void World::Render() {
 	//for (int index = 0; index < m_raytraceCells.size(); index++) {
 	if ( !m_raytraceCells.empty() ) {
 		x = m_raytraceCells[m_cellFocusRange] & ConstantParameters::BLOCKS_X_AXIS - 1;
-		y = (m_raytraceCells[m_cellFocusRange] >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-		z = (m_raytraceCells[m_cellFocusRange] >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+		y = (m_raytraceCells[m_cellFocusRange] >> 7) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+		z = (m_raytraceCells[m_cellFocusRange] >> 14) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
 		m_renderer.DrawTargetCellOutline(Vector3(x, y, z));
 	}
@@ -419,30 +424,30 @@ void World::GameOfLifeCellularAutomataPass2D() {
 	
 	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_DEPTH; index++) {
 		x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
-		y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-		z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+		y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+		z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
 		if ( x > 0 ) {	//left
-			if ( m_solidBlocks[ index - 1 ].m_isSolid ) {	//left
+			if ( m_worldBlockCells[ index - 1 ].m_isSolid ) {	//left
 				SOLID_COUNTER++;
 			}
 
 			if ( y > 0 ) {
-				if ( m_solidBlocks[ index - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//bottom
+				if ( m_worldBlockCells[ index - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//bottom
 					SOLID_COUNTER++;
 				}
 
-				if ( m_solidBlocks[ index - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//left bottom
+				if ( m_worldBlockCells[ index - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//left bottom
 					SOLID_COUNTER++;
 				}
 			}
 
 			if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {
-				if ( m_solidBlocks[ index + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //top
+				if ( m_worldBlockCells[ index + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //top
 					SOLID_COUNTER++;
 				}
 				
-				if ( m_solidBlocks[ index - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//left top
+				if ( m_worldBlockCells[ index - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//left top
 					SOLID_COUNTER++;
 				}
 			}
@@ -450,18 +455,18 @@ void World::GameOfLifeCellularAutomataPass2D() {
 		}
 
 		if ( x < ( ConstantParameters::BLOCKS_X_AXIS - 1 ) ) {	//right
-			if ( m_solidBlocks[ index + 1 ].m_isSolid ) {	//right
+			if ( m_worldBlockCells[ index + 1 ].m_isSolid ) {	//right
 				SOLID_COUNTER++;
 			}
 
 			if ( y > 0 ) {	//bottom right
-				if ( m_solidBlocks[ index + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+				if ( m_worldBlockCells[ index + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 					SOLID_COUNTER++;
 				}
 			}
 
 			if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {	//above right
-				if ( m_solidBlocks[ index + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+				if ( m_worldBlockCells[ index + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 					SOLID_COUNTER++;
 				}
 			}
@@ -474,19 +479,19 @@ void World::GameOfLifeCellularAutomataPass2D() {
 			m_temporaryCellularVector[index].m_isSolid = false;
 		}
 		else {
-			m_temporaryCellularVector[index].m_isSolid = m_solidBlocks[index].m_isSolid;
+			m_temporaryCellularVector[index].m_isSolid = m_worldBlockCells[index].m_isSolid;
 		}
 
 		SOLID_COUNTER = 0;
 	}
 
 	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_DEPTH; index++) {
-		m_solidBlocks[index] = m_temporaryCellularVector[index];
+		m_worldBlockCells[index] = m_temporaryCellularVector[index];
 
-		if ( m_solidBlocks[index].m_isSolid ) {
+		if ( m_worldBlockCells[index].m_isSolid ) {
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
-			y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-			z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
+			y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
 			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
 		}
 	}
@@ -505,54 +510,54 @@ void World::GameOfLifeCellularAutomataPass3D() {
 	
 	for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++) {
 		x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
-		y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-		z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+		y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+		z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
 		//Above
 		if ( z < ( ConstantParameters::BLOCKS_Z_AXIS - 1 ) ) {
-			if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT ].m_isSolid ) {	//above
+			if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT ].m_isSolid ) {	//above
 				SOLID_COUNTER++;
 			}
 
 			if ( x > 0 ) {	//above left
-				if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 ].m_isSolid ) {	//above left
+				if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 ].m_isSolid ) {	//above left
 					SOLID_COUNTER++;
 				}
 
 				if ( y > 0 ) {
-					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//above bottom
+					if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//above bottom
 						SOLID_COUNTER++;
 					}
 					
-					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //above left bottom
+					if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //above left bottom
 						SOLID_COUNTER++;
 					}
 				}
 
 				if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {
-					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//above top
+					if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//above top
 						SOLID_COUNTER++;
 					}
 
-					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //above left top
+					if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //above left top
 						SOLID_COUNTER++;
 					}
 				}
 			}
 
 			if ( x < ( ConstantParameters::BLOCKS_X_AXIS - 1 ) ) {	//above right
-				if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 ].m_isSolid ) {	//above right
+				if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 ].m_isSolid ) {	//above right
 					SOLID_COUNTER++;
 				}
 
 				if ( y > 0 ) {	//above right bottom
-					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+					if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 						SOLID_COUNTER++;
 					}
 				}
 
 				if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {	//above right top
-					if ( m_solidBlocks[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+					if ( m_worldBlockCells[ index + ConstantParameters::WIDTH_TIMES_HEIGHT + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 						SOLID_COUNTER++;
 					}
 				}
@@ -561,49 +566,49 @@ void World::GameOfLifeCellularAutomataPass3D() {
 
 		//Below
 		if ( z > 0 ) {
-			if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT ].m_isSolid ) {	//below
+			if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT ].m_isSolid ) {	//below
 				SOLID_COUNTER++;
 			}
 
 			if ( x > 0 ) {	//below left
-				if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 ].m_isSolid ) {	//below left
+				if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 ].m_isSolid ) {	//below left
 					SOLID_COUNTER++;
 				}
 
 				if ( y > 0 ) {
-					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//below bottom
+					if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//below bottom
 						SOLID_COUNTER++;
 					}
 
-					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //below left bottom
+					if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //below left bottom
 						SOLID_COUNTER++;
 					}
 				}
 
 				if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {
-					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//below top
+					if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//below top
 						SOLID_COUNTER++;
 					}
 
-					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //below left top
+					if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //below left top
 						SOLID_COUNTER++;
 					}
 				}
 			}
 
 			if ( x < ( ConstantParameters::BLOCKS_X_AXIS - 1 ) ) {	//below right
-				if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 ].m_isSolid ) {	//below right
+				if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 ].m_isSolid ) {	//below right
 					SOLID_COUNTER++;
 				}
 
 				if ( y > 0 ) {	//below right bottom
-					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+					if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 						SOLID_COUNTER++;
 					}
 				}
 
 				if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {	//below right top
-					if ( m_solidBlocks[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
+					if ( m_worldBlockCells[ index - ConstantParameters::WIDTH_TIMES_HEIGHT + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 						SOLID_COUNTER++;
 					}
 				}
@@ -612,43 +617,43 @@ void World::GameOfLifeCellularAutomataPass3D() {
 
 		//Middle
 		if ( x > 0 ) {	//left
-			if ( m_solidBlocks[ index - 1 ].m_isSolid ) {	//left
+			if ( m_worldBlockCells[ index - 1 ].m_isSolid ) {	//left
 				SOLID_COUNTER++;
 			}
 
 			if ( y > 0 ) {
-				if ( m_solidBlocks[ index - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//bottom
+				if ( m_worldBlockCells[ index - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//bottom
 					SOLID_COUNTER++;
 				}
 
-				if ( m_solidBlocks[ index - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//left bottom
+				if ( m_worldBlockCells[ index - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//left bottom
 					SOLID_COUNTER++;
 				}
 			}
 
 			if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {
-				if ( m_solidBlocks[ index + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //top
+				if ( m_worldBlockCells[ index + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //top
 					SOLID_COUNTER++;
 				}
 
-				if ( m_solidBlocks[ index - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//left top
+				if ( m_worldBlockCells[ index - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//left top
 					SOLID_COUNTER++;
 				}
 			}
 		}
 
 		if ( x < ( ConstantParameters::BLOCKS_X_AXIS - 1 ) ) {	//right
-			if ( m_solidBlocks[ index + 1 ].m_isSolid ) {	//right
+			if ( m_worldBlockCells[ index + 1 ].m_isSolid ) {	//right
 				SOLID_COUNTER++;
 			}
 
 			if ( y > 0 ) {	//bottom right
-				if ( m_solidBlocks[ index + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )
+				if ( m_worldBlockCells[ index + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )
 					SOLID_COUNTER++;
 			}
 
 			if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {	//above right
-				if ( m_solidBlocks[ index + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )
+				if ( m_worldBlockCells[ index + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid )
 					SOLID_COUNTER++;
 			}
 		}
@@ -660,19 +665,19 @@ void World::GameOfLifeCellularAutomataPass3D() {
 			m_temporaryCellularVector[index].m_isSolid = false;
 		}
 		else {
-			m_temporaryCellularVector[index].m_isSolid = m_solidBlocks[index].m_isSolid;
+			m_temporaryCellularVector[index].m_isSolid = m_worldBlockCells[index].m_isSolid;
 		}
 
 		SOLID_COUNTER = 0;
 	}
 
 	for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++) {
-		m_solidBlocks[index] = m_temporaryCellularVector[index];
+		m_worldBlockCells[index] = m_temporaryCellularVector[index];
 
-		if ( m_solidBlocks[index].m_isSolid ) {
+		if ( m_worldBlockCells[index].m_isSolid ) {
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
-			y = (index >> 6) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-			z = (index >> 12) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
+			y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
 			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
 		}
 	}

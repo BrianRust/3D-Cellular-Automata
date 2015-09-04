@@ -45,7 +45,7 @@ public:
 	void Render();
 
 	bool m_isKeyDown[ 256 ];
-	std::vector<CubeCell> m_solidBlocks;
+	std::vector<CubeCell> m_worldBlockCells;
 	bool m_keyIsHeld;
 
 	std::vector<CubeCell> m_temporaryCellularVector;
