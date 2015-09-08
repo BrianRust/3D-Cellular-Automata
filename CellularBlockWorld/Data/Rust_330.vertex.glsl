@@ -1,6 +1,6 @@
-#version 110
+#version 330
 
-//	vertex shader, GLSL 1.10
+//	vertex shader, GLSL 3.30
 //
 //	INPUTS
 //		gl_Vertex : vertex position in object space (raw, from VBO)
