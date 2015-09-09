@@ -9,7 +9,7 @@
 uniform mat4 u_modelViewProjectionMatrix;
 
 in vec4 v_Vertex;
-in vec3 v_Normal;
+in uint v_Normal;
 
 
 //	OUTPUTS
@@ -19,7 +19,8 @@ in vec3 v_Normal;
 out vec4 v_screenPosition;
 out vec4 v_worldPosition;
 out vec3 v_normal;
-//out vec4 v_surfaceColor;
+out vec4 v_surfaceColor;
+
 //out vec2 v_textureCoordinates;
 
 //varying vec3 v_normal;
@@ -31,29 +32,35 @@ void main()
 	v_screenPosition = gl_Position;
 	v_worldPosition = v_Vertex;
 
-	if( v_Normal == 0 )
+	if ( v_Normal == uint(0) )
 	{
 		v_normal = vec3(0.0, -1.0, 0.0);
+		v_surfaceColor = vec4(0.0, 1.0, 0.0, 1.0);
 	}
-	else if( v_Normal == 1 )
+	else if ( v_Normal == uint(1) )
 	{
 		v_normal = vec3(1.0, 0.0, 0.0);
+		v_surfaceColor = vec4(1.0, 1.0, 0.0, 1.0);
 	}
-	else if( v_Normal == 2 )
+	else if ( v_Normal == uint(2) )
 	{
 		v_normal = vec3(0.0, 1.0, 0.0);
+		v_surfaceColor = vec4(0.0, 1.0, 1.0, 1.0);
 	}
-	else if( v_Normal == 3 )
+	else if ( v_Normal == uint(3) )
 	{
 		v_normal = vec3(0.0, 0.0, 1.0);
+		v_surfaceColor = vec4(1.0, 0.0, 1.0, 1.0);
 	}
-	else if( v_Normal == 4 )
+	else if ( v_Normal == uint(4) )
 	{
 		v_normal = vec3(-1.0, 0.0, 0.0);
+		v_surfaceColor = vec4(1.0, 0.0, 0.0, 1.0);
 	}
-	else if( v_Normal == 5 )
+	else if ( v_Normal == uint(5) )
 	{
 		v_normal = vec3(0.0, 0.0, -1.0);
+		v_surfaceColor = vec4(0.0, 0.0, 1.0, 1.0);
 	}
 
 //	v_surfaceColor = gl_Color;

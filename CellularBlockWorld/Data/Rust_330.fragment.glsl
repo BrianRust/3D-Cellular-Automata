@@ -11,6 +11,8 @@ in vec4 v_screenPosition;
 in vec4 v_worldPosition;
 in vec3 v_normal;
 
+in vec4 v_surfaceColor;
+
 //	OUTPUTS
 out vec4 FragmentColor;
 
@@ -48,7 +50,9 @@ void main()
 
 	if ( u_wireframeBool == 0 ) 
 	{
-		FragmentColor.xyz = vec3(1.0, 0.0, 0.0) * totalDiffuseColorForAllLights * 0.7;
+		FragmentColor.xyz = v_surfaceColor.xyz * totalDiffuseColorForAllLights * 0.7;
+		//FragmentColor.xyz = vec3(1.0, 0.0, 0.0) * totalDiffuseColorForAllLights * 0.7;
+		//FragmentColor.xyz = v_surfaceColor.xyz * 0.7;
 		FragmentColor.w = 1.0;
 	}
 	else

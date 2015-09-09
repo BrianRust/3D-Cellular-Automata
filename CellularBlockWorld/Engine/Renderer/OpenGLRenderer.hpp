@@ -86,6 +86,7 @@ extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 extern PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
 extern PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
+extern PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
 
 extern PFNGLUNIFORM3FVPROC glUniform3fv;
 #endif //included_OpenGLRenderer

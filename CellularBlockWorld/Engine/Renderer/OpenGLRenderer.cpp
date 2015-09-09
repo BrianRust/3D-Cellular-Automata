@@ -29,6 +29,7 @@ PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer = nullptr;
 PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray = nullptr;
 PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray = nullptr;
 PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv = nullptr;
+PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer = nullptr;
 
 PFNGLUNIFORM3FVPROC glUniform3fv = nullptr;
 
@@ -229,6 +230,7 @@ void OpenGLRenderer::Initialize() {
 	glDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC) wglGetProcAddress( "glDisableVertexAttribArray" );
 	glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC) wglGetProcAddress( "glGetAttribLocation" );
 	glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC) wglGetProcAddress( "glUniformMatrix4fv" );
+	glVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC) wglGetProcAddress( "glVertexAttribIPointer" );
 
 	glUniform3fv = (PFNGLUNIFORM3FVPROC) wglGetProcAddress( "glUniform3fv" );
 
@@ -258,11 +260,8 @@ void OpenGLRenderer::Initialize() {
 
 //-----------------------------------------------------------------------------------------------
 void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition ) {
-	//m_blockVertices.clear();
 	Vector3 newPosition = Vector3(0.f, 0.f, 0.f);
-	//Vector3 normal = Vector3(0.f, 0.f, 1.f);
 	unsigned char sideValue;
-	RGBA GridColor = RGBA(0.f, 0.f, 0.f, 1.f);
 	
 	//FRONT
 	//normal = Vector3(0.f, -1.f, 0.f);
@@ -437,6 +436,7 @@ void OpenGLRenderer::PushGridOutlineVerticesToVBO() {
 
 //---------------------
 void OpenGLRenderer::SendCubeVBO() {
+	//render the sides
 	glUniformMatrix4fv(m_modelViewProjectionUniformLocation, 1, false, m_modelviewProjectionStack.m_MatrixStack[m_modelviewProjectionStack.m_MatrixStack.size()-1].m_Matrix);
 	glUniform1i( m_wireFrameBoolLocation, 0);
 	
@@ -444,24 +444,11 @@ void OpenGLRenderer::SendCubeVBO() {
 	glEnableVertexAttribArray(m_vertexAttributeLocation);
 	glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
 	glEnableVertexAttribArray(m_normalAttributeLocation);
-	glVertexAttribPointer(m_normalAttributeLocation, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, side));
-
-
-// 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (void*) offsetof(Vertex, vertexPosition));
-// 	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (void*) offsetof(Vertex, color)); 
-// //	glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Vertex), (void*) offsetof(Vertex, color)); 
-// 	glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*) offsetof(Vertex, normal));
-// 	glEnableClientState(GL_VERTEX_ARRAY);
-// 	glEnableClientState(GL_COLOR_ARRAY);
-// 	glEnableClientState(GL_NORMAL_ARRAY);
+	glVertexAttribIPointer(m_normalAttributeLocation, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (unsigned char*) offsetof(Vertex, side));
 
 	glDrawArrays(GL_QUADS, 0, m_blockVertices.size());
 	glDisableVertexAttribArray(m_vertexAttributeLocation);
 	glDisableVertexAttribArray(m_normalAttributeLocation);
-
-// 	glDisableClientState(GL_VERTEX_ARRAY);
-// 	glDisableClientState(GL_COLOR_ARRAY);
-// 	glDisableClientState(GL_NORMAL_ARRAY);
 
 	glUniform1i( m_wireFrameBoolLocation, 1);
 
@@ -475,14 +462,6 @@ void OpenGLRenderer::SendCubeVBO() {
 	glDrawArrays(GL_LINES, 0, m_wireframeVertices.size());
 	glDisableVertexAttribArray(m_vertexAttributeLocation);
 	glDisableVertexAttribArray(m_normalAttributeLocation);
-// 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
-// 	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, color)); 
-// 	glEnableClientState(GL_VERTEX_ARRAY);
-// 	glEnableClientState(GL_COLOR_ARRAY);
-// 
-// 	glDrawArrays(GL_LINES, 0, m_wireframeVertices.size());
-// 	glDisableClientState(GL_VERTEX_ARRAY);
-// 	glDisableClientState(GL_COLOR_ARRAY);
 }
 
 //----------------------
