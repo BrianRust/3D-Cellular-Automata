@@ -43,11 +43,12 @@ void main()
 	lightToPoint = normalize(u_cameraPosition - v_worldPosition.xyz);
 
 	totalDiffuseColorForAllLights += clamp(dot( v_normal, lightToPoint ), 0.0, 1.0)* lightColor.xyz * lightColor.w;
-	totalSpecularForAllLights += lightColor.xyz * lightColor.w;
+	//totalSpecularRatio += pow(clamp(dot( reflectedLight, lightToPoint ), 0.0, 1.0), 1.0 + specularPower * glossiness);
+	//totalSpecularForAllLights += lightColor.xyz * lightColor.w;
 
 	if ( u_wireframeBool == 0 ) 
 	{
-		FragmentColor.xyz = vec3(1.0, 0.0, 0.0) * totalDiffuseColorForAllLights;
+		FragmentColor.xyz = vec3(1.0, 0.0, 0.0) * totalDiffuseColorForAllLights * 0.7;
 		FragmentColor.w = 1.0;
 	}
 	else
