@@ -1,5 +1,7 @@
-
 #include "World.hpp"
+
+static bool leftMouseButtonDown = false;
+static bool rightMouseButtonDown = false;
 
 //----------------------------------------------------
 World::World(  ) 
@@ -17,6 +19,7 @@ World::World(  )
 	m_keyIsHeld = false;
 }
 
+//----------------------------------------------------
 void World::Initialize() {
 	for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++) {
 		m_worldBlockCells.push_back(CubeCell(false));
@@ -24,6 +27,7 @@ void World::Initialize() {
 	BuildZone3D();
 }
 
+//----------------------------------------------------
 void World::BuildZone2D() {
 	unsigned int x = 0;
 	unsigned int y = 0;
@@ -41,7 +45,7 @@ void World::BuildZone2D() {
 			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
 			m_worldBlockCells[index] = true;
-			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
+			m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
 
 			counter++;
 		}
@@ -56,6 +60,7 @@ void World::BuildZone2D() {
 	m_renderer.PushGridOutlineVerticesToVBO();
 }
 
+//----------------------------------------------------
 void World::BuildZone3D() {
 	unsigned int x = 0;
 	unsigned int y = 0;
@@ -78,7 +83,7 @@ void World::BuildZone3D() {
 			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
 			m_worldBlockCells[index] = true;
-			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
+			m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
 			counter++;
 		}
 		else {
@@ -92,6 +97,7 @@ void World::BuildZone3D() {
 	m_renderer.PushGridOutlineVerticesToVBO();
 }
 
+//----------------------------------------------------
 void World::TestSolidCellularAutomataPass() {
 	unsigned int x = 0;
 	unsigned int y = 0;
@@ -245,7 +251,7 @@ void World::TestSolidCellularAutomataPass() {
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
 			y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
 			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
-			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
+			m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
 		}
 	}
 
@@ -277,6 +283,47 @@ void World::FindCameraFacingVector() {
 	m_camera.m_cameraFacingVector.x = cos(m_camera.m_cameraYaw) * cos(m_camera.m_cameraPitch);
 	m_camera.m_cameraFacingVector.y = sin(m_camera.m_cameraYaw) * cos(m_camera.m_cameraPitch);
 	m_camera.m_cameraFacingVector.z = -sin(m_camera.m_cameraPitch);
+}
+
+//----------------------------------------------------
+void World::UpdateFromMouseInput() {
+	// Only allow one press per frame
+	bool mouseButtonPressed = false;
+	
+	//Check the mouse left button 
+	if ( (GetKeyState(VK_LBUTTON) & 0x8000) != 0 ) 
+	{
+		if ( !leftMouseButtonDown ) 
+		{
+			TurnTargetedCellToSolid();
+		}
+
+		leftMouseButtonDown = true;
+		mouseButtonPressed = true;
+	} 
+	else 
+	{
+		leftMouseButtonDown = false;
+	}
+
+	if ( mouseButtonPressed )
+	{
+		return;
+	}
+
+	//Check the mouse right button 
+	if ( (GetKeyState(VK_RBUTTON) & 0x8000) != 0 ) 
+	{
+		if ( !rightMouseButtonDown ) 
+		{
+			TurnTargetedCellToNonSolid();
+		} 
+		rightMouseButtonDown = true;
+	} 
+	else 
+	{
+		rightMouseButtonDown = false;
+	}
 }
 
 //----------------------------------------------------
@@ -368,11 +415,12 @@ void World::CheckForGimbleLock() {
 
 //----------------------------------------------------
 void World::Update() {
-	float currentTime = Time::GetCurrentTimeSeconds();
+	float currentTime = (float) Time::GetCurrentTimeSeconds();
 	float deltaSeconds = ConstantParameters::DELTA_SECONDS; // Hack: assume 60 FPS
 	//	GetCursorPos()
 	UpdatePlayerFromInput( deltaSeconds );
 	UpdateCameraFromInput( deltaSeconds );
+	UpdateFromMouseInput();
 	FindCameraFacingVector();
 	CheckForGimbleLock();
 
@@ -399,16 +447,16 @@ void World::Render() {
 	unsigned int y = 0;
 	unsigned int z = 0;
 
-	m_renderer.SendViewMatrix(m_camera);
+	m_renderer.SetModelViewProjectionMatrix(m_camera);
 	m_renderer.SendCubeVBO();
 
-	//for (int index = 0; index < m_raytraceCells.size(); index++) {
 	if ( !m_raytraceCells.empty() ) {
 		x = m_raytraceCells[m_cellFocusRange] & ConstantParameters::BLOCKS_X_AXIS - 1;
-		y = (m_raytraceCells[m_cellFocusRange] >> 7) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-		z = (m_raytraceCells[m_cellFocusRange] >> 14) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+		y = (m_raytraceCells[m_cellFocusRange] >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+		z = (m_raytraceCells[m_cellFocusRange] >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
-		m_renderer.DrawTargetCellOutline(Vector3(x, y, z));
+		m_renderer.SendViewMatrix(m_camera);
+		m_renderer.DrawTargetCellOutline(Vector3((float) x, (float) y, (float) z));
 	}
 
 	m_renderer.PopMatrix();
@@ -492,7 +540,7 @@ void World::GameOfLifeCellularAutomataPass2D() {
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
 			y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
 			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
-			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
+			m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
 		}
 	}
 
@@ -678,7 +726,7 @@ void World::GameOfLifeCellularAutomataPass3D() {
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
 			y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
 			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
-			m_renderer.AddCubeToBuffer(Vector3(x, y, z), RGBA(0.8f, 0.f, 0.f, 1.f));
+			m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
 		}
 	}
 
@@ -706,14 +754,14 @@ void World::GetAllCellsInRayTrace() {
 			( (yPos < ConstantParameters::BLOCKS_Y_AXIS) && ( yPos >= 0.f ) ) && 
 			( (zPos < ConstantParameters::BLOCKS_Z_AXIS) && ( zPos >= 0.f ) ) )
 		{
-			int x = xPos;
-			int y = yPos;
-			int z = zPos;
+			int x = (int) xPos;
+			int y = (int) yPos;
+			int z = (int) zPos;
 
 			int index = ( x + ( y * ConstantParameters::BLOCKS_Y_AXIS ) + ( z * ConstantParameters::BLOCKS_X_AXIS * ConstantParameters::BLOCKS_Y_AXIS ) );
 
 			if ( !m_raytraceCells.empty() ) {
-				for (int counter = 0; counter < m_raytraceCells.size(); counter++) {
+				for (unsigned int counter = 0; counter < m_raytraceCells.size(); counter++) {
 					if ( m_raytraceCells[counter] == index ) {
 						foundBlock = true;
 						break;
@@ -732,8 +780,7 @@ void World::GetAllCellsInRayTrace() {
 }
 
 //--------------------------------------------
-void World::IncreaseFocus()
-{
+void World::IncreaseFocus() {
 	m_cellFocusRange++;
 	if (m_cellFocusRange >= m_raytraceCells.size() ) {
 		m_cellFocusRange = m_raytraceCells.size() - 1;
@@ -741,8 +788,7 @@ void World::IncreaseFocus()
 }
 
 //--------------------------------------------
-void World::ReduceFocus()
-{
+void World::ReduceFocus() {
 	m_cellFocusRange--;
 	if (m_cellFocusRange < 0) {
 		m_cellFocusRange = 0;
@@ -750,14 +796,69 @@ void World::ReduceFocus()
 }
 
 //--------------------------------------------
-void World::CapFocus()
-{
+void World::CapFocus() {
 	if (m_cellFocusRange >= m_raytraceCells.size() ) {
 		m_cellFocusRange = m_raytraceCells.size() - 1;
 	}
 
 	if (m_cellFocusRange < 0) {
 		m_cellFocusRange = 0;
+	}
+}
+
+//--------------------------------------------
+void World::TurnTargetedCellToSolid() {
+	unsigned int x = 0;
+	unsigned int y = 0;
+	unsigned int z = 0;
+	
+	if ( !m_raytraceCells.empty() ) {
+		x = m_raytraceCells[m_cellFocusRange] & ConstantParameters::BLOCKS_X_AXIS - 1;
+		y = (m_raytraceCells[m_cellFocusRange] >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+		z = (m_raytraceCells[m_cellFocusRange] >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+
+		if ( !m_worldBlockCells[m_raytraceCells[m_cellFocusRange]].m_isSolid ) {
+			m_renderer.DeleteBuffers();
+			m_worldBlockCells[m_raytraceCells[m_cellFocusRange]].m_isSolid = true;
+
+			for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++) {
+				if ( m_worldBlockCells[index].m_isSolid ) {
+					x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
+					y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+					z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
+					m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
+				}
+			}
+			m_renderer.PushCubeVerticesToVBO();
+		}
+	}
+}
+
+//--------------------------------------------
+void World::TurnTargetedCellToNonSolid() {
+	unsigned int x = 0;
+	unsigned int y = 0;
+	unsigned int z = 0;
+	
+	if ( !m_raytraceCells.empty() ) {
+		x = m_raytraceCells[m_cellFocusRange] & ConstantParameters::BLOCKS_X_AXIS - 1;
+		y = (m_raytraceCells[m_cellFocusRange] >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+		z = (m_raytraceCells[m_cellFocusRange] >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+
+		if ( m_worldBlockCells[m_raytraceCells[m_cellFocusRange]].m_isSolid ) {
+			m_renderer.DeleteBuffers();
+			m_worldBlockCells[m_raytraceCells[m_cellFocusRange]].m_isSolid = false;
+
+			for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++) {
+				if ( m_worldBlockCells[index].m_isSolid ) {
+					x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
+					y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+					z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
+					m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
+				}
+			}
+			m_renderer.PushCubeVerticesToVBO();
+		}
 	}
 }
 

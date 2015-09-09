@@ -24,17 +24,25 @@ PFNGLUNIFORM1IPROC glUniform1i = nullptr;
 PFNGLGETPROGRAMIVPROC glGetProgramiv = nullptr;
 PFNGLACTIVETEXTUREPROC glActiveTexture = nullptr;
 
+PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation = nullptr;
+PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer = nullptr;
+PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray = nullptr;
+PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray = nullptr;
+PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv = nullptr;
+
 PFNGLUNIFORM3FVPROC glUniform3fv = nullptr;
 
 //----------------------------------
-OpenGLRenderer::OpenGLRenderer() {
-	m_blockVBOid = 0;
-	m_wireframeVBOid = 0;
+OpenGLRenderer::OpenGLRenderer() 
+	: m_modelviewProjectionStack(MatrixStack())
+	, m_blockVBOid(0)
+	, m_wireframeVBOid(0)
+{
+	
 }
 
 //----------------------------------
 int OpenGLRenderer::CreateVertexShader(const char* Filename) {
-	int length = 0;
 	FILE * shaderFile;
 	long sizeOfFile;
 	GLchar* shaderText;
@@ -107,7 +115,6 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename) {
 
 //----------------------------------
 int OpenGLRenderer::CreateFragmentShader(const char* Filename) {
-	int length = 0;
 	FILE * shaderFile;
 	long sizeOfFile;
 	GLchar* shaderText;
@@ -217,15 +224,26 @@ void OpenGLRenderer::Initialize() {
 	glGetProgramiv = (PFNGLGETPROGRAMIVPROC) wglGetProcAddress( "glGetProgramiv" );
 	glActiveTexture = (PFNGLACTIVETEXTUREPROC) wglGetProcAddress( "glActiveTexture");
 
+	glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC) wglGetProcAddress( "glEnableVertexAttribArray" );
+	glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC) wglGetProcAddress( "glVertexAttribPointer" );
+	glDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC) wglGetProcAddress( "glDisableVertexAttribArray" );
+	glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC) wglGetProcAddress( "glGetAttribLocation" );
+	glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC) wglGetProcAddress( "glUniformMatrix4fv" );
+
 	glUniform3fv = (PFNGLUNIFORM3FVPROC) wglGetProcAddress( "glUniform3fv" );
 
 	//m_orientationTexture = Texture::CreateOrGetTexture("../Data/Images/OrientationTest.png");
 
-	m_vertexShaderID = CreateVertexShader("Data/Rust_100.vertex.glsl");
-	m_fragmentShaderID = CreateFragmentShader("Data/Rust_100.fragment.glsl");
+	m_vertexShaderID = CreateVertexShader("Data/Rust_330.vertex.glsl");
+	m_fragmentShaderID = CreateFragmentShader("Data/Rust_330.fragment.glsl");
 	m_shaderProgramID = CreateShaderProgram(m_vertexShaderID, m_fragmentShaderID);
 
+	m_wireFrameBoolLocation = glGetUniformLocation(m_shaderProgramID, "u_wireframeBool");
 	m_cameraPosition = glGetUniformLocation(m_shaderProgramID, "u_cameraPosition");
+	m_modelViewProjectionUniformLocation = glGetUniformLocation(m_shaderProgramID, "u_modelViewProjectionMatrix");
+	//m_normalAttributeLocation = glGetUniformLocation(m_shaderProgramID, "u_normal");
+	m_normalAttributeLocation = glGetAttribLocation(m_shaderProgramID, "v_Normal");
+	m_vertexAttributeLocation = glGetAttribLocation(m_shaderProgramID, "v_Vertex");
 
 	glGenBuffers(1, &m_blockVBOid);
 	glGenBuffers(1, &m_wireframeVBOid);
@@ -234,149 +252,155 @@ void OpenGLRenderer::Initialize() {
 
 	const int NUM_VERTS_PER_BLOCK = 24;
 
-	m_blockVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK * ( ConstantParameters::SOLID_BLOCK_PERCENTAGE_3D / 100 ) );
-	m_wireframeVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK * ( ConstantParameters::SOLID_BLOCK_PERCENTAGE_3D / 100 ) );
+	m_blockVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK * ( ConstantParameters::SOLID_BLOCK_PERCENTAGE_3D / 1000 ) );
+	m_wireframeVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK * ( ConstantParameters::SOLID_BLOCK_PERCENTAGE_3D / 1000 ) );
 }
 
 //-----------------------------------------------------------------------------------------------
-void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition, const RGBA& color ) {
-	const int NUM_VERTS_PER_BLOCK = 24;
+void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition ) {
 	//m_blockVertices.clear();
-	Vector2 texCoordinate = Vector2(0.f, 0.f);
 	Vector3 newPosition = Vector3(0.f, 0.f, 0.f);
-	Vector3 normal = Vector3(0.f, 0.f, 1.f);
+	//Vector3 normal = Vector3(0.f, 0.f, 1.f);
+	unsigned char sideValue;
 	RGBA GridColor = RGBA(0.f, 0.f, 0.f, 1.f);
 	
 	//FRONT
-	normal = Vector3(0.f, -1.f, 0.f);
+	//normal = Vector3(0.f, -1.f, 0.f);
+	sideValue = 0;
 	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	
 	//RIGHT
-	normal = Vector3(1.f, 0.f, 0.f);
+	//normal = Vector3(1.f, 0.f, 0.f);
+	sideValue = 1;
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 
 	//BACK
-	normal = Vector3(0.f, 1.f, 0.f);
+	//normal = Vector3(0.f, 1.f, 0.f);
+	sideValue = 2;
 	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 
 	//TOP
-	normal = Vector3(0.f, 0.f, 1.f);
+	//normal = Vector3(0.f, 0.f, 1.f);
+	sideValue = 3;
 	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 
 	//LEFT
-	normal = Vector3(-1.f, 0.f, 0.f);
+	//normal = Vector3(-1.f, 0.f, 0.f);
+	sideValue = 4;
 	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 
 	//BOTTOM
-	normal = Vector3(0.f, 0.f, -1.f);
+	//normal = Vector3(0.f, 0.f, -1.f);
+	sideValue = 5;
 	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, color, texCoordinate, normal ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 
 
 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 
 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 
 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 
 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 
 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 
 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f , minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 
 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 
 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 
 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 
 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 
 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 
 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
-	m_wireframeVertices.push_back( Vertex( newPosition, GridColor, texCoordinate ) );
+	m_wireframeVertices.push_back( Vertex( newPosition ) );
 }
 
 //---------------------
-void OpenGLRenderer::SendViewMatrix( Camera myCamera ) {
+void OpenGLRenderer::SendViewMatrix(const Camera& myCamera ) {
+	glUseProgram(0);
 	glDisable(GL_TEXTURE_2D);
 	glPushMatrix();
 	gluPerspective(50.0, (16.f/9.f), 0.1, 1000.0);
@@ -393,56 +417,75 @@ void OpenGLRenderer::SendViewMatrix( Camera myCamera ) {
 	glUniform3fv(m_cameraPosition, 1, &myCamera.m_cameraPosition.x);
 }
 
+//---------------------
 void OpenGLRenderer::PopMatrix() {
 	glPopMatrix();
+	m_modelviewProjectionStack.PopMatrix();
 }
 
+//---------------------
 void OpenGLRenderer::PushCubeVerticesToVBO() {
 	glBindBuffer(GL_ARRAY_BUFFER, m_blockVBOid);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*m_blockVertices.size(),&m_blockVertices.front(),GL_STATIC_DRAW);
 }
 
+//---------------------
 void OpenGLRenderer::PushGridOutlineVerticesToVBO() {
 	glBindBuffer(GL_ARRAY_BUFFER, m_wireframeVBOid);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*m_wireframeVertices.size(),&m_wireframeVertices.front(),GL_STATIC_DRAW);
 }
 
+//---------------------
 void OpenGLRenderer::SendCubeVBO() {
-	float timeNow = (float)Time::GetCurrentTimeSeconds();
-	GLint uniformloc;
+	glUniformMatrix4fv(m_modelViewProjectionUniformLocation, 1, false, m_modelviewProjectionStack.m_MatrixStack[m_modelviewProjectionStack.m_MatrixStack.size()-1].m_Matrix);
+	glUniform1i( m_wireFrameBoolLocation, 0);
 	
-	glUseProgram(m_shaderProgramID);
-	uniformloc = glGetUniformLocation(m_shaderProgramID, "u_time");
-	timeNow = fmod(timeNow, 1.f);
-	glUniform1f(uniformloc, timeNow);
-	uniformloc = glGetUniformLocation(m_shaderProgramID, "u_diffuseTexture");
-
 	glBindBuffer(GL_ARRAY_BUFFER, m_blockVBOid);
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (void*) offsetof(Vertex, vertexPosition));
-	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (void*) offsetof(Vertex, color)); 
-//	glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Vertex), (void*) offsetof(Vertex, color)); 
-	glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*) offsetof(Vertex, normal));
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableVertexAttribArray(m_vertexAttributeLocation);
+	glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
+	glEnableVertexAttribArray(m_normalAttributeLocation);
+	glVertexAttribPointer(m_normalAttributeLocation, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, side));
+
+
+// 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (void*) offsetof(Vertex, vertexPosition));
+// 	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (void*) offsetof(Vertex, color)); 
+// //	glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Vertex), (void*) offsetof(Vertex, color)); 
+// 	glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*) offsetof(Vertex, normal));
+// 	glEnableClientState(GL_VERTEX_ARRAY);
+// 	glEnableClientState(GL_COLOR_ARRAY);
+// 	glEnableClientState(GL_NORMAL_ARRAY);
 
 	glDrawArrays(GL_QUADS, 0, m_blockVertices.size());
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableVertexAttribArray(m_vertexAttributeLocation);
+	glDisableVertexAttribArray(m_normalAttributeLocation);
+
+// 	glDisableClientState(GL_VERTEX_ARRAY);
+// 	glDisableClientState(GL_COLOR_ARRAY);
+// 	glDisableClientState(GL_NORMAL_ARRAY);
+
+	glUniform1i( m_wireFrameBoolLocation, 1);
 
 	//wireframe
 	glBindBuffer(GL_ARRAY_BUFFER, m_wireframeVBOid);
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
-	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, color)); 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
+	glEnableVertexAttribArray(m_vertexAttributeLocation);
+	glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
+	glEnableVertexAttribArray(m_normalAttributeLocation);
+	glVertexAttribPointer(m_normalAttributeLocation, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, side));
 
 	glDrawArrays(GL_LINES, 0, m_wireframeVertices.size());
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableVertexAttribArray(m_vertexAttributeLocation);
+	glDisableVertexAttribArray(m_normalAttributeLocation);
+// 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
+// 	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (float*) offsetof(Vertex, color)); 
+// 	glEnableClientState(GL_VERTEX_ARRAY);
+// 	glEnableClientState(GL_COLOR_ARRAY);
+// 
+// 	glDrawArrays(GL_LINES, 0, m_wireframeVertices.size());
+// 	glDisableClientState(GL_VERTEX_ARRAY);
+// 	glDisableClientState(GL_COLOR_ARRAY);
 }
 
+//----------------------
 void OpenGLRenderer::DeleteBuffers() {
 	//glDeleteBuffers(1, &m_blockVBOid);
 	m_blockVertices.clear();
@@ -451,9 +494,10 @@ void OpenGLRenderer::DeleteBuffers() {
 	m_wireframeVertices.clear();
 }
 
+//-------------------------------------
 void OpenGLRenderer::DrawTargetCellOutline(Vector3 startPosition) {
 	RGBA lineColor(1.f, 1.f, 1.f, 1.f);
-	glUseProgram(0);
+	//glUseProgram(0);
 	
 	glLineWidth(3.f);
 	glBegin(GL_LINES);
@@ -497,4 +541,35 @@ void OpenGLRenderer::DrawTargetCellOutline(Vector3 startPosition) {
 	}
 	glEnd();
 	glUseProgram(m_shaderProgramID);
+}
+
+//-----------------------------------
+void OpenGLRenderer::SetModelViewProjectionMatrix(const Camera& camera)
+{
+	glUniform3fv(m_cameraPosition, 1, &camera.m_cameraPosition.x);
+	
+	MatrixStack multiplyMatrix;
+
+	m_modelviewProjectionStack.PushMatrix();
+	m_modelviewProjectionStack.SetToPerspectiveMatrix(90.f * ConstantParameters::CONVERTING_TO_RADIANS, (ConstantParameters::ASPECT_RATIO), 0.1f, 1000.f);
+
+	Matrix4x4& currentMatrix = m_modelviewProjectionStack.m_MatrixStack[m_modelviewProjectionStack.m_MatrixStack.size()-1];
+
+	multiplyMatrix.SetToRotationMatrixX(-1.f * ConstantParameters::NINETY_DEGREES_AS_RADIANS);
+	currentMatrix = currentMatrix * multiplyMatrix.m_MatrixStack[multiplyMatrix.m_MatrixStack.size()-1];
+
+	multiplyMatrix.SetToRotationMatrixZ(ConstantParameters::NINETY_DEGREES_AS_RADIANS);
+	currentMatrix = currentMatrix * multiplyMatrix.m_MatrixStack[multiplyMatrix.m_MatrixStack.size()-1];
+
+	multiplyMatrix.SetToRotationMatrixX(-1.f * camera.m_cameraRoll);
+	currentMatrix = currentMatrix * multiplyMatrix.m_MatrixStack[multiplyMatrix.m_MatrixStack.size()-1];
+
+	multiplyMatrix.SetToRotationMatrixY(-1.f * camera.m_cameraPitch);
+	currentMatrix = currentMatrix * multiplyMatrix.m_MatrixStack[multiplyMatrix.m_MatrixStack.size()-1];
+
+	multiplyMatrix.SetToRotationMatrixZ(-1.f * camera.m_cameraYaw);
+	currentMatrix = currentMatrix * multiplyMatrix.m_MatrixStack[multiplyMatrix.m_MatrixStack.size()-1];
+
+	multiplyMatrix.SetToTranslationMatrix(-camera.m_cameraPosition.x, -camera.m_cameraPosition.y, -camera.m_cameraPosition.z);
+	currentMatrix = currentMatrix * multiplyMatrix.m_MatrixStack[multiplyMatrix.m_MatrixStack.size()-1];
 }

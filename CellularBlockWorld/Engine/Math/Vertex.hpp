@@ -20,27 +20,20 @@ class Vertex
 public:
 	Vertex() {
 		vertexPosition = Vector3(0.f, 0.f, 0.f);
-		color = RGBA(0.f, 0.f, 0.f, 1.f);
-		normal = Vector3(1.f, 0.f, 0.f);
-//		texCoordinates = Vector2(0.f, 0.f);
+		side = 0;
 	};
-	Vertex(const Vector3& InitialPosition, const RGBA& InitialColor, const Vector2& InitialUVCoordinates) {
+
+	Vertex(const Vector3& InitialPosition) {
 		vertexPosition = InitialPosition;
-		color = InitialColor;
-//		texCoordinates = InitialUVCoordinates;
-		normal = Vector3(1.f, 0.f, 0.f);
+		side = 0;
 	}
 
-	Vertex(const Vector3& InitialPosition, const RGBA& InitialColor, const Vector2& InitialUVCoordinates, const Vector3& initialNormal) {
+	Vertex(const Vector3& InitialPosition, unsigned char Side) {
 		vertexPosition = InitialPosition;
-		color = InitialColor;
-//		texCoordinates = InitialUVCoordinates;
-		normal = initialNormal;
+		side = Side;
 	}
 	Vector3 vertexPosition;
-	RGBA color;
-//	Vector2 texCoordinates;
-	Vector3 normal;
+	unsigned char side;
 };
 
 #endif //included_Vertex

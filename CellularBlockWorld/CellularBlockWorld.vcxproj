@@ -107,6 +107,7 @@
   <ItemGroup>
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Main_Win32.cpp" />
+    <ClCompile Include="Engine\Matrix\MatrixStack.cpp" />
     <ClCompile Include="Engine\Renderer\OpenGLRenderer.cpp" />
     <ClCompile Include="Engine\Time\Time.cpp" />
     <ClCompile Include="Game\World.cpp" />
@@ -122,6 +123,8 @@
     <ClInclude Include="Engine\Math\Vector3.hpp" />
     <ClInclude Include="Engine\Math\Vector4.hpp" />
     <ClInclude Include="Engine\Math\Vertex.hpp" />
+    <ClInclude Include="Engine\Matrix\Matrix4x4.hpp" />
+    <ClInclude Include="Engine\Matrix\MatrixStack.hpp" />
     <ClInclude Include="Engine\Renderer\glext.h" />
     <ClInclude Include="Engine\Renderer\OpenGLRenderer.hpp" />
     <ClInclude Include="Engine\Time\Time.hpp" />
@@ -129,8 +132,8 @@
     <ClInclude Include="Game\World.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\Rust_100.fragment.glsl" />
-    <None Include="Data\Rust_100.vertex.glsl" />
+    <None Include="Data\Rust_330.fragment.glsl" />
+    <None Include="Data\Rust_330.vertex.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

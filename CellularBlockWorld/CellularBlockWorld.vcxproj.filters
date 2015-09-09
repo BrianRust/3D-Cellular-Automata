@@ -23,6 +23,9 @@
     <Filter Include="Engine\Camera">
       <UniqueIdentifier>{acf3109a-1c4a-4379-93ff-e6463e4884a8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Matrix">
+      <UniqueIdentifier>{91639ab6-1e52-4333-8b11-2d4f9684eb41}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Main_Win32.cpp">
@@ -39,6 +42,9 @@
     </ClCompile>
     <ClCompile Include="Game\World.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Matrix\MatrixStack.cpp">
+      <Filter>Engine\Matrix</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -87,12 +93,18 @@
     <ClInclude Include="Game\CubeCell.hpp">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Matrix\Matrix4x4.hpp">
+      <Filter>Engine\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Matrix\MatrixStack.hpp">
+      <Filter>Engine\Matrix</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\Rust_100.fragment.glsl">
+    <None Include="Data\Rust_330.fragment.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Data\Rust_100.vertex.glsl">
+    <None Include="Data\Rust_330.vertex.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

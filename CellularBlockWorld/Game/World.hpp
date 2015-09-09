@@ -24,6 +24,7 @@ public:
 	bool ProcessKeyUpEvent( unsigned char virtualKeyCode);
 	void UpdatePlayerFromInput( float deltaseconds );
 	void UpdateCameraFromInput( float deltaseconds );
+	void UpdateFromMouseInput();
 	void FindCameraFacingVector();
 	void CheckForGimbleLock();
 	void Initialize();
@@ -34,6 +35,9 @@ public:
 
 	void GameOfLifeCellularAutomataPass2D();
 	void GameOfLifeCellularAutomataPass3D();
+
+	void TurnTargetedCellToSolid();
+	void TurnTargetedCellToNonSolid();
 
 	void IncreaseFocus();
 	void ReduceFocus();
@@ -54,7 +58,7 @@ public:
 	Camera m_camera;
 	OpenGLRenderer m_renderer;
 
-	int m_cellFocusRange;
+	unsigned int m_cellFocusRange;
 
 	float m_mousePositionXDifference;
 	float m_mousePositionZDifference;

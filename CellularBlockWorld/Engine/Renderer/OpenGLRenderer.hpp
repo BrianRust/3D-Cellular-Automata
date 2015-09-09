@@ -13,6 +13,8 @@
 #include "../Constants.hpp"
 #include "../Camera/Camera.hpp"
 #include "../Time/Time.hpp"
+#include "../Matrix/MatrixStack.hpp"
+#include "../Matrix/Matrix4x4.hpp"
 #pragma comment( lib, "glu32") // Link in the GLu.lib static library
 
 
@@ -22,22 +24,24 @@ class OpenGLRenderer
 public:
 	OpenGLRenderer();
 	void Initialize();
-	void SendViewMatrix( Camera myCamera );
-	void AddCubeToBuffer(const Vector3& minPosition, const RGBA& color);
+	void SendViewMatrix( const Camera& myCamera );
+	void AddCubeToBuffer( const Vector3& minPosition );
 	void PushCubeVerticesToVBO();
 	void PushGridOutlineVerticesToVBO();
 	void PopMatrix();
 	void SendCubeVBO();
 
-	void DrawTargetCellOutline(Vector3 startPosition);
+	void DrawTargetCellOutline( Vector3 startPosition );
 
 	void DeleteBuffers();
+	void SetModelViewProjectionMatrix(const Camera& camera);
 
-	int CreateVertexShader(const char* Filename);
-	int CreateFragmentShader(const char* Filename);
-	int CreateShaderProgram(GLint vertexShaderID, GLint fragmentShaderID);
+	int CreateVertexShader( const char* Filename );
+	int CreateFragmentShader( const char* Filename );
+	int CreateShaderProgram( GLint vertexShaderID, GLint fragmentShaderID );
 
 	bool isInitializing;
+	MatrixStack m_modelviewProjectionStack;
 
 	unsigned int m_blockVBOid;
 	std::vector<Vertex> m_blockVertices;
@@ -50,9 +54,10 @@ public:
 	GLuint m_shaderProgramID;
 
 	GLuint m_cameraPosition;
+	GLuint m_wireFrameBoolLocation;
+	GLuint m_modelViewProjectionUniformLocation;
 	GLuint m_normalAttributeLocation;
-	GLuint m_biTangentAttributeLocation;
-	GLuint m_tangentAttributeLocation;
+	GLuint m_vertexAttributeLocation;
 };
 extern PFNGLGENBUFFERSPROC glGenBuffers;
 extern PFNGLBINDBUFFERPROC glBindBuffer;
@@ -75,6 +80,12 @@ extern PFNGLUNIFORM1FPROC glUniform1f;
 extern PFNGLUNIFORM1IPROC glUniform1i;
 extern PFNGLGETPROGRAMIVPROC glGetProgramiv;
 extern PFNGLACTIVETEXTUREPROC glActiveTexture;
+
+extern PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
+extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
+extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+extern PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
+extern PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 
 extern PFNGLUNIFORM3FVPROC glUniform3fv;
 #endif //included_OpenGLRenderer
