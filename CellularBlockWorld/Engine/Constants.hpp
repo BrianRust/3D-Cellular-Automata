@@ -65,6 +65,12 @@ namespace ConstantParameters
 // 	const unsigned int PRODUCE_LIFE_THRESHOLD_UPPERBOUND_3D = 5;
 // 	const unsigned int REMOVE_LIFE_THRESHOLD_UPPERBOUND_3D = 8;
 // 	const unsigned int REMOVE_LIFE_THRESHOLD_LOWERBOUND_3D = 1;
+
+/*
+---Immigration Variant---
+Same as original but with two Living states. 
+When a new cell is born, it takes on the ON state that is the majority in the three cells that gave it birth.
+*/
 	
 }
 
