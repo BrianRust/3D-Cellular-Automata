@@ -38,7 +38,7 @@ void World::BuildZone2D() {
 
 	int counter = 0;
 
-	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_DEPTH; index++) {
+	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_HEIGHT; index++) {
 		if ( (rand() % 100) < ConstantParameters::SOLID_BLOCK_PERCENTAGE_2D ) {
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
 			y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
@@ -465,7 +465,7 @@ void World::GameOfLifeCellularAutomataPass2D() {
 
 	unsigned int SOLID_COUNTER = 0;
 	
-	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_DEPTH; index++) {
+	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_HEIGHT; index++) {
 		x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
 		y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
 		z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
@@ -528,7 +528,7 @@ void World::GameOfLifeCellularAutomataPass2D() {
 		SOLID_COUNTER = 0;
 	}
 
-	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_DEPTH; index++) {
+	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_HEIGHT; index++) {
 		m_worldBlockCells[index] = m_temporaryCellularVector[index];
 
 		if ( m_worldBlockCells[index].m_isSolid ) {
