@@ -24,8 +24,8 @@ namespace ConstantParameters
 	const float ASPECT_RATIO = 16.f/9.f;
 	const float INVERSE_ASPECT_RATIO = 9.f/16.f;
 
-	const unsigned int BLOCKS_X_POWER = 8;
-	const unsigned int BLOCKS_Y_POWER = 8;
+	const unsigned int BLOCKS_X_POWER = 6;
+	const unsigned int BLOCKS_Y_POWER = 6;
 	const unsigned int BLOCKS_Z_POWER = 6;
 	const unsigned int BLOCKS_XY_POWER = BLOCKS_X_POWER + BLOCKS_Y_POWER;
 	
@@ -38,7 +38,7 @@ namespace ConstantParameters
 	const unsigned int WIDTH_TIMES_DEPTH = BLOCKS_X_AXIS * BLOCKS_Z_AXIS;
 	const unsigned int TOTAL_BLOCKS_IN_ZONE = BLOCKS_X_AXIS * BLOCKS_Y_AXIS * BLOCKS_Z_AXIS;
 	const unsigned int SOLID_BLOCK_PERCENTAGE_2D = 50;
-	const unsigned int SOLID_BLOCK_PERCENTAGE_3D = 13;
+	const unsigned int SOLID_BLOCK_PERCENTAGE_3D = 15;
 
 //2D checks 8 Cubes
 	const unsigned int PRODUCE_LIFE_THRESHOLD_2D = 3;

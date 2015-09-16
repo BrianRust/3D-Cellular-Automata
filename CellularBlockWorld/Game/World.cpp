@@ -57,7 +57,6 @@ void World::BuildZone2D() {
 	}
 
 	m_renderer.PushCubeVerticesToVBO();
-	m_renderer.PushGridOutlineVerticesToVBO();
 }
 
 //----------------------------------------------------
@@ -65,8 +64,6 @@ void World::BuildZone3D() {
 	unsigned int x = 0;
 	unsigned int y = 0;
 	unsigned int z = 0;
-
-	
 
 	//m_solidBlocks.clear();
 	//m_temporaryCellularVector.clear();
@@ -94,7 +91,6 @@ void World::BuildZone3D() {
 	}
 
 	m_renderer.PushCubeVerticesToVBO();
-	m_renderer.PushGridOutlineVerticesToVBO();
 }
 
 //----------------------------------------------------
@@ -256,7 +252,6 @@ void World::TestSolidCellularAutomataPass() {
 	}
 
 	m_renderer.PushCubeVerticesToVBO();
-	m_renderer.PushGridOutlineVerticesToVBO();
 	//m_temporaryCellularVector.clear();
 }
 
@@ -437,27 +432,27 @@ void World::Update() {
 		}
 	}
 
-	GetAllCellsInRayTrace();
-	CapFocus();
+	//GetAllCellsInRayTrace();
+	//CapFocus();
 }
 
 //----------------------------------------------------
 void World::Render() {	
-	unsigned int x = 0;
-	unsigned int y = 0;
-	unsigned int z = 0;
+// 	unsigned int x = 0;
+// 	unsigned int y = 0;
+// 	unsigned int z = 0;
 
 	m_renderer.SetModelViewProjectionMatrix(m_camera);
 	m_renderer.SendCubeVBO();
 
-	if ( !m_raytraceCells.empty() ) {
-		x = m_raytraceCells[m_cellFocusRange] & ConstantParameters::BLOCKS_X_AXIS - 1;
-		y = (m_raytraceCells[m_cellFocusRange] >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-		z = (m_raytraceCells[m_cellFocusRange] >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
-
-		m_renderer.SendViewMatrix(m_camera);
-		m_renderer.DrawTargetCellOutline(Vector3((float) x, (float) y, (float) z));
-	}
+// 	if ( !m_raytraceCells.empty() ) {
+// 		x = m_raytraceCells[m_cellFocusRange] & ConstantParameters::BLOCKS_X_AXIS - 1;
+// 		y = (m_raytraceCells[m_cellFocusRange] >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
+// 		z = (m_raytraceCells[m_cellFocusRange] >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+// 
+// 		m_renderer.SendViewMatrix(m_camera);
+// 		m_renderer.DrawTargetCellOutline(Vector3((float) x, (float) y, (float) z));
+// 	}
 
 	m_renderer.PopMatrix();
 }
@@ -545,7 +540,6 @@ void World::GameOfLifeCellularAutomataPass2D() {
 	}
 
 	m_renderer.PushCubeVerticesToVBO();
-	m_renderer.PushGridOutlineVerticesToVBO();
 }
 
 //----------------------------------------------------
@@ -731,7 +725,6 @@ void World::GameOfLifeCellularAutomataPass3D() {
 	}
 
 	m_renderer.PushCubeVerticesToVBO();
-	m_renderer.PushGridOutlineVerticesToVBO();
 }
 
 //---------------------------------------------

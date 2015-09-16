@@ -36,3 +36,4 @@ CellularBlockWorld/Release/link.command.1.tlog
 CellularBlockWorld/Release/link.read.1.tlog
 CellularBlockWorld/Release/mt.command.1.tlog
 *.tlog
+*.unsuccessfulbuild

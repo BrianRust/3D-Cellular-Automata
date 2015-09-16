@@ -37,7 +37,6 @@ PFNGLUNIFORM3FVPROC glUniform3fv = nullptr;
 OpenGLRenderer::OpenGLRenderer() 
 	: m_modelviewProjectionStack(MatrixStack())
 	, m_blockVBOid(0)
-	, m_wireframeVBOid(0)
 {
 	
 }
@@ -248,14 +247,13 @@ void OpenGLRenderer::Initialize() {
 	m_vertexAttributeLocation = glGetAttribLocation(m_shaderProgramID, "v_Vertex");
 
 	glGenBuffers(1, &m_blockVBOid);
-	glGenBuffers(1, &m_wireframeVBOid);
-
 	isInitializing = true;
 
 	const int NUM_VERTS_PER_BLOCK = 24;
 
 	m_blockVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK * ( ConstantParameters::SOLID_BLOCK_PERCENTAGE_3D / 1000 ) );
-	m_wireframeVertices.reserve( ConstantParameters::TOTAL_BLOCKS_IN_ZONE * NUM_VERTS_PER_BLOCK * ( ConstantParameters::SOLID_BLOCK_PERCENTAGE_3D / 1000 ) );
+
+	glUseProgram(m_shaderProgramID);
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -334,67 +332,6 @@ void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition ) {
 	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
 	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-
-
-// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 
-// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 
-// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f , minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 
-// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 
-// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 
-// 	newPosition = Vector3(minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 
-// 	newPosition = Vector3(minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
-// 	newPosition = Vector3(minPosition.x, minPosition.y, minPosition.z + 1.f);
-// 	m_wireframeVertices.push_back( Vertex( newPosition ) );
 }
 
 //---------------------
@@ -429,12 +366,6 @@ void OpenGLRenderer::PushCubeVerticesToVBO() {
 }
 
 //---------------------
-void OpenGLRenderer::PushGridOutlineVerticesToVBO() {
-	//glBindBuffer(GL_ARRAY_BUFFER, m_wireframeVBOid);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*m_wireframeVertices.size(),&m_wireframeVertices.front(),GL_STATIC_DRAW);
-}
-
-//---------------------
 void OpenGLRenderer::SendCubeVBO() {
 	//render the sides
 	glUniformMatrix4fv(m_modelViewProjectionUniformLocation, 1, false, m_modelviewProjectionStack.m_MatrixStack[m_modelviewProjectionStack.m_MatrixStack.size()-1].m_Matrix);
@@ -442,7 +373,8 @@ void OpenGLRenderer::SendCubeVBO() {
 	
 	glBindBuffer(GL_ARRAY_BUFFER, m_blockVBOid);
 	glEnableVertexAttribArray(m_vertexAttributeLocation);
-	glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
+	//glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
+	glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, positionBytes));
 	//glVertexAttribIPointer(m_vertexAttributeLocation, 3, GL_UNSIGNED_BYTE, sizeof(Vertex), (unsigned char*) offsetof(Vertex, positionBytes));
 	glEnableVertexAttribArray(m_normalAttributeLocation);
 	//glVertexAttribPointer(m_normalAttributeLocation, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (unsigned char*) offsetof(Vertex, side));
@@ -458,29 +390,12 @@ void OpenGLRenderer::SendCubeVBO() {
 
 	glDisableVertexAttribArray(m_vertexAttributeLocation);
 	glDisableVertexAttribArray(m_normalAttributeLocation);
-
-// 	glUniform1i( m_wireFrameBoolLocation, 1);
-// 
-// 	//wireframe
-// 	glBindBuffer(GL_ARRAY_BUFFER, m_wireframeVBOid);
-// 	glEnableVertexAttribArray(m_vertexAttributeLocation);
-// 	//glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, vertexPosition));
-// 	glVertexAttribIPointer(m_vertexAttributeLocation, 3, GL_UNSIGNED_BYTE, sizeof(Vertex), (unsigned char*) offsetof(Vertex, positionBytes));
-// 	glEnableVertexAttribArray(m_normalAttributeLocation);
-// 	glVertexAttribPointer(m_normalAttributeLocation, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, side));
-// 
-// 	glDrawArrays(GL_LINES, 0, m_wireframeVertices.size());
-// 	glDisableVertexAttribArray(m_vertexAttributeLocation);
-// 	glDisableVertexAttribArray(m_normalAttributeLocation);
 }
 
 //----------------------
 void OpenGLRenderer::DeleteBuffers() {
 	//glDeleteBuffers(1, &m_blockVBOid);
 	m_blockVertices.clear();
-
-	//glDeleteBuffers(1, &m_wireframeVBOid);
-	m_wireframeVertices.clear();
 }
 
 //-------------------------------------

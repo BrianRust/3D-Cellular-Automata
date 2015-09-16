@@ -27,7 +27,6 @@ public:
 	void SendViewMatrix( const Camera& myCamera );
 	void AddCubeToBuffer( const Vector3& minPosition );
 	void PushCubeVerticesToVBO();
-	void PushGridOutlineVerticesToVBO();
 	void PopMatrix();
 	void SendCubeVBO();
 
@@ -45,9 +44,6 @@ public:
 
 	unsigned int m_blockVBOid;
 	std::vector<Vertex> m_blockVertices;
-
-	unsigned int m_wireframeVBOid;
-	std::vector<Vertex> m_wireframeVertices;
 
 	GLuint m_vertexShaderID;
 	GLuint m_fragmentShaderID;
