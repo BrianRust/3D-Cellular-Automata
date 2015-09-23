@@ -36,21 +36,24 @@ void World::BuildZone2D() {
 	//m_solidBlocks.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
 	//m_temporaryCellularVector.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
 
-	int counter = 0;
-
 	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_HEIGHT; index++) {
 		if ( (rand() % 100) < ConstantParameters::SOLID_BLOCK_PERCENTAGE_2D ) {
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
 			y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
 			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
-			m_worldBlockCells[index] = true;
-			m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
+			m_worldBlockCells[index].m_isSolid = true;
 
-			counter++;
+			if ( (rand() % 100) < ConstantParameters::BLACK_BLOCK_PERCENTAGE ) {
+				m_worldBlockCells[index].m_isBlack = true;
+				m_renderer.AddBlackCubeToBuffer(Vector3((float) x, (float) y, (float) z));
+			} else {
+				m_worldBlockCells[index].m_isBlack = false;
+				m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
+			}
 		}
 		else {
-			m_worldBlockCells[index] = false;
+			m_worldBlockCells[index].m_isSolid = false;
 		}
 
 		m_temporaryCellularVector.push_back((CubeCell(false)));
@@ -71,20 +74,23 @@ void World::BuildZone3D() {
 	//m_solidBlocks.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
 	m_temporaryCellularVector.reserve(ConstantParameters::TOTAL_BLOCKS_IN_ZONE);
 
-	int counter = 0;
-
 	for (unsigned int index = 0; index < ConstantParameters::TOTAL_BLOCKS_IN_ZONE; index++) {
 		if ( (rand() % 100) < ConstantParameters::SOLID_BLOCK_PERCENTAGE_3D ) {
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
 			y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
 			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
 
-			m_worldBlockCells[index] = true;
-			m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
-			counter++;
+			m_worldBlockCells[index].m_isSolid = true;
+			if ( (rand() % 100) < ConstantParameters::BLACK_BLOCK_PERCENTAGE ) {
+				m_worldBlockCells[index].m_isBlack = true;
+				m_renderer.AddBlackCubeToBuffer(Vector3((float) x, (float) y, (float) z));
+			} else {
+				m_worldBlockCells[index].m_isBlack = false;
+				m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
+			}
 		}
 		else {
-			m_worldBlockCells[index] = false;
+			m_worldBlockCells[index].m_isSolid = false;
 		}
 
 		m_temporaryCellularVector.push_back((CubeCell(false)));
@@ -331,7 +337,12 @@ void World::UpdatePlayerFromInput( float deltaSeconds ) {
 	if ( m_isKeyDown[ 'T' ] && !m_keyIsHeld ) {
 		m_keyIsHeld = true;
 		m_renderer.DeleteBuffers();
-		GameOfLifeCellularAutomataPass3D();
+		if (m_is2DWorld) {
+			GameOfLifeCellularAutomataPass2D();
+		} else {
+			GameOfLifeCellularAutomataPass3D();
+		}
+
 		//TestSolidCellularAutomataPass();
 	}
 
@@ -438,22 +449,8 @@ void World::Update() {
 
 //----------------------------------------------------
 void World::Render() {	
-// 	unsigned int x = 0;
-// 	unsigned int y = 0;
-// 	unsigned int z = 0;
-
 	m_renderer.SetModelViewProjectionMatrix(m_camera);
 	m_renderer.SendCubeVBO();
-
-// 	if ( !m_raytraceCells.empty() ) {
-// 		x = m_raytraceCells[m_cellFocusRange] & ConstantParameters::BLOCKS_X_AXIS - 1;
-// 		y = (m_raytraceCells[m_cellFocusRange] >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-// 		z = (m_raytraceCells[m_cellFocusRange] >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
-// 
-// 		m_renderer.SendViewMatrix(m_camera);
-// 		m_renderer.DrawTargetCellOutline(Vector3((float) x, (float) y, (float) z));
-// 	}
-
 	m_renderer.PopMatrix();
 }
 
@@ -464,6 +461,8 @@ void World::GameOfLifeCellularAutomataPass2D() {
 	unsigned int z = 0;
 
 	unsigned int SOLID_COUNTER = 0;
+	unsigned int BLACK_COUNTER = 0;
+	unsigned int COLORED_COUNTER = 0;
 	
 	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_HEIGHT; index++) {
 		x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
@@ -473,25 +472,50 @@ void World::GameOfLifeCellularAutomataPass2D() {
 		if ( x > 0 ) {	//left
 			if ( m_worldBlockCells[ index - 1 ].m_isSolid ) {	//left
 				SOLID_COUNTER++;
+				if ( m_worldBlockCells[ index - 1 ].m_isBlack ) {
+					BLACK_COUNTER++;
+				} else {
+					COLORED_COUNTER++;
+				}
 			}
 
 			if ( y > 0 ) {
 				if ( m_worldBlockCells[ index - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//bottom
 					SOLID_COUNTER++;
+					if ( m_worldBlockCells[ index - ConstantParameters::BLOCKS_Y_AXIS ].m_isBlack ) {
+						BLACK_COUNTER++;
+					} else {
+						COLORED_COUNTER++;
+					}
 				}
 
 				if ( m_worldBlockCells[ index - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//left bottom
 					SOLID_COUNTER++;
+					if ( m_worldBlockCells[ index - 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isBlack ) {
+						BLACK_COUNTER++;
+					} else {
+						COLORED_COUNTER++;
+					}
 				}
 			}
 
 			if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {
 				if ( m_worldBlockCells[ index + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) { //top
 					SOLID_COUNTER++;
+					if ( m_worldBlockCells[ index + ConstantParameters::BLOCKS_Y_AXIS ].m_isBlack ) {
+						BLACK_COUNTER++;
+					} else {
+						COLORED_COUNTER++;
+					}
 				}
 				
 				if ( m_worldBlockCells[ index - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {	//left top
 					SOLID_COUNTER++;
+					if ( m_worldBlockCells[ index - 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isBlack ) {
+						BLACK_COUNTER++;
+					} else {
+						COLORED_COUNTER++;
+					}
 				}
 			}
 
@@ -500,32 +524,56 @@ void World::GameOfLifeCellularAutomataPass2D() {
 		if ( x < ( ConstantParameters::BLOCKS_X_AXIS - 1 ) ) {	//right
 			if ( m_worldBlockCells[ index + 1 ].m_isSolid ) {	//right
 				SOLID_COUNTER++;
+				if ( m_worldBlockCells[ index + 1 ].m_isBlack ) {
+					BLACK_COUNTER++;
+				} else {
+					COLORED_COUNTER++;
+				}
 			}
 
 			if ( y > 0 ) {	//bottom right
 				if ( m_worldBlockCells[ index + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 					SOLID_COUNTER++;
+					if ( m_worldBlockCells[ index + 1 - ConstantParameters::BLOCKS_Y_AXIS ].m_isBlack ) {
+						BLACK_COUNTER++;
+					} else {
+						COLORED_COUNTER++;
+					}
 				}
 			}
 
 			if ( y < ( ConstantParameters::BLOCKS_Y_AXIS - 1 ) ) {	//above right
 				if ( m_worldBlockCells[ index + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isSolid ) {
 					SOLID_COUNTER++;
+					if ( m_worldBlockCells[ index + 1 + ConstantParameters::BLOCKS_Y_AXIS ].m_isBlack ) {
+						BLACK_COUNTER++;
+					} else {
+						COLORED_COUNTER++;
+					}
 				}
 			}
 		}
 
 		if ( SOLID_COUNTER == ConstantParameters::PRODUCE_LIFE_THRESHOLD_2D ) {
 			m_temporaryCellularVector[index].m_isSolid = true;
+
+			if ( BLACK_COUNTER > COLORED_COUNTER ) {
+				m_temporaryCellularVector[index].m_isBlack = true;
+			} else {
+				m_temporaryCellularVector[index].m_isBlack = false;
+			}
 		} 
 		else if ( ( SOLID_COUNTER <= ConstantParameters::REMOVE_LIFE_THRESHOLD_LOWERBOUND_2D ) || ( SOLID_COUNTER >= ConstantParameters::REMOVE_LIFE_THRESHOLD_UPPERBOUND_2D ) ) {
 			m_temporaryCellularVector[index].m_isSolid = false;
 		}
 		else {
 			m_temporaryCellularVector[index].m_isSolid = m_worldBlockCells[index].m_isSolid;
+			m_temporaryCellularVector[index].m_isBlack = m_worldBlockCells[index].m_isBlack;
 		}
 
 		SOLID_COUNTER = 0;
+		BLACK_COUNTER = 0;
+		COLORED_COUNTER = 0;
 	}
 
 	for (unsigned int index = 0; index < ConstantParameters::WIDTH_TIMES_HEIGHT; index++) {
@@ -534,8 +582,14 @@ void World::GameOfLifeCellularAutomataPass2D() {
 		if ( m_worldBlockCells[index].m_isSolid ) {
 			x = index & ConstantParameters::BLOCKS_X_AXIS - 1;
 			y = (index >> ConstantParameters::BLOCKS_Y_POWER) & ConstantParameters::BLOCKS_Y_AXIS - 1;
-			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;	
-			m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
+			z = (index >> ConstantParameters::BLOCKS_XY_POWER) & ConstantParameters::BLOCKS_Z_AXIS - 1;
+
+			if ( m_worldBlockCells[index].m_isBlack ) {
+				m_renderer.AddBlackCubeToBuffer(Vector3((float) x, (float) y, (float) z));
+			} else {
+				m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
+			}
+			//m_renderer.AddCubeToBuffer(Vector3((float) x, (float) y, (float) z));
 		}
 	}
 

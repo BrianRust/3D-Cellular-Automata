@@ -26,11 +26,12 @@ public:
 	void Initialize();
 	void SendViewMatrix( const Camera& myCamera );
 	void AddCubeToBuffer( const Vector3& minPosition );
+	void AddBlackCubeToBuffer( const Vector3& minPosition );
 	void PushCubeVerticesToVBO();
 	void PopMatrix();
 	void SendCubeVBO();
 
-	void DrawTargetCellOutline( Vector3 startPosition );
+	void DrawTargetCellOutline( const Vector3& startPosition );
 
 	void DeleteBuffers();
 	void SetModelViewProjectionMatrix(const Camera& camera);

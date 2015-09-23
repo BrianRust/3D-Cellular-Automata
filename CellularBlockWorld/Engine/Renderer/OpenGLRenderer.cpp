@@ -334,6 +334,85 @@ void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition ) {
 	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
 }
 
+//----------------------
+void OpenGLRenderer::AddBlackCubeToBuffer( const Vector3& minPosition )
+{
+	Vector3 newPosition = Vector3(0.f, 0.f, 0.f);
+	unsigned char sideValue;
+
+	//FRONT
+	//normal = Vector3(0.f, -1.f, 0.f);
+	sideValue = 6;
+	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z + 1.f );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+
+	//RIGHT
+	//normal = Vector3(1.f, 0.f, 0.f);
+	sideValue = 6;
+	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+
+	//BACK
+	//normal = Vector3(0.f, 1.f, 0.f);
+	sideValue = 6;
+	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+
+	//TOP
+	//normal = Vector3(0.f, 0.f, 1.f);
+	sideValue = 6;
+	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z + 1.f );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+
+	//LEFT
+	//normal = Vector3(-1.f, 0.f, 0.f);
+	sideValue = 6;
+	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z + 1.f );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+
+	//BOTTOM
+	//normal = Vector3(0.f, 0.f, -1.f);
+	sideValue = 6;
+	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+}
+
 //---------------------
 void OpenGLRenderer::SendViewMatrix(const Camera& myCamera ) {
 	glUseProgram(0);
@@ -399,7 +478,7 @@ void OpenGLRenderer::DeleteBuffers() {
 }
 
 //-------------------------------------
-void OpenGLRenderer::DrawTargetCellOutline(Vector3 startPosition) {
+void OpenGLRenderer::DrawTargetCellOutline(const Vector3& startPosition) {
 	RGBA lineColor(1.f, 1.f, 1.f, 1.f);
 	//glUseProgram(0);
 	
@@ -477,3 +556,5 @@ void OpenGLRenderer::SetModelViewProjectionMatrix(const Camera& camera)
 	multiplyMatrix.SetToTranslationMatrix(-camera.m_cameraPosition.x, -camera.m_cameraPosition.y, -camera.m_cameraPosition.z);
 	currentMatrix = currentMatrix * multiplyMatrix.m_MatrixStack[multiplyMatrix.m_MatrixStack.size()-1];
 }
+
+

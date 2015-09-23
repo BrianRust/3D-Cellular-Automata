@@ -73,4 +73,10 @@ void main()
 	v_surfaceColor.rgb += vec3(-1.0, 0.0, 1.0) * mix(1.0, 0.0, clamp(sign(5.0 - v_Normal), 0.0, 1.0));
 	//normal(0.0, 0.0, -1.0)
 	//color(0.0, 0.0, 1.0)
+
+	//6 (Black Cube)
+	v_normal += vec3(1.0, 0.0, 1.0) * mix(1.0, 0.0, clamp(sign(6.0 - v_Normal), 0.0, 1.0));
+	v_surfaceColor.rgb += vec3(0.0, 0.0, -1.0) * mix(1.0, 0.0, clamp(sign(6.0 - v_Normal), 0.0, 1.0));
+	//normal(0.0, 0.0, 0.0)
+	//color(0.0, 0.0, 0.0)
 }
