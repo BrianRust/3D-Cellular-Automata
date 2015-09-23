@@ -24,8 +24,8 @@ namespace ConstantParameters
 	const float ASPECT_RATIO = 16.f/9.f;
 	const float INVERSE_ASPECT_RATIO = 9.f/16.f;
 
-	const unsigned int BLOCKS_X_POWER = 8;
-	const unsigned int BLOCKS_Y_POWER = 8;
+	const unsigned int BLOCKS_X_POWER = 6;
+	const unsigned int BLOCKS_Y_POWER = 6;
 	const unsigned int BLOCKS_Z_POWER = 6;
 	const unsigned int BLOCKS_XY_POWER = BLOCKS_X_POWER + BLOCKS_Y_POWER;
 	

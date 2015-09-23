@@ -369,7 +369,7 @@ void OpenGLRenderer::PushCubeVerticesToVBO() {
 void OpenGLRenderer::SendCubeVBO() {
 	//render the sides
 	glUniformMatrix4fv(m_modelViewProjectionUniformLocation, 1, false, m_modelviewProjectionStack.m_MatrixStack[m_modelviewProjectionStack.m_MatrixStack.size()-1].m_Matrix);
-	glUniform1i( m_wireFrameBoolLocation, 0);
+	glUniform1i( m_wireFrameBoolLocation, 1);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, m_blockVBOid);
 	glEnableVertexAttribArray(m_vertexAttributeLocation);
@@ -377,13 +377,13 @@ void OpenGLRenderer::SendCubeVBO() {
 	glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, positionBytes));
 	//glVertexAttribIPointer(m_vertexAttributeLocation, 3, GL_UNSIGNED_BYTE, sizeof(Vertex), (unsigned char*) offsetof(Vertex, positionBytes));
 	glEnableVertexAttribArray(m_normalAttributeLocation);
-	//glVertexAttribPointer(m_normalAttributeLocation, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (unsigned char*) offsetof(Vertex, side));
-	glVertexAttribIPointer(m_normalAttributeLocation, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (unsigned char*) offsetof(Vertex, side));
+	glVertexAttribPointer(m_normalAttributeLocation, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (unsigned char*) offsetof(Vertex, side));
+	//glVertexAttribIPointer(m_normalAttributeLocation, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (unsigned char*) offsetof(Vertex, side));
 
 	glDrawArrays(GL_QUADS, 0, m_blockVertices.size());
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE );
-	glUniform1i( m_wireFrameBoolLocation, 1);
+	glUniform1i( m_wireFrameBoolLocation, 0);
 	glDrawArrays(GL_QUADS, 0, m_blockVertices.size());
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL );
 
