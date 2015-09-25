@@ -38,7 +38,7 @@ namespace ConstantParameters
 	const unsigned int WIDTH_TIMES_DEPTH = BLOCKS_X_AXIS * BLOCKS_Z_AXIS;
 	const unsigned int TOTAL_BLOCKS_IN_ZONE = BLOCKS_X_AXIS * BLOCKS_Y_AXIS * BLOCKS_Z_AXIS;
 	const unsigned int SOLID_BLOCK_PERCENTAGE_2D = 50;
-	const unsigned int SOLID_BLOCK_PERCENTAGE_3D = 15;
+	const unsigned int SOLID_BLOCK_PERCENTAGE_3D = 14;
 	const unsigned int BLACK_BLOCK_PERCENTAGE = 50;
 
 //2D checks 8 Cubes

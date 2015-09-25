@@ -29,4 +29,4 @@ public:
 	bool m_isBlack;
 };
 
-#endif //included_Vertex
+#endif //included_CubeCell
