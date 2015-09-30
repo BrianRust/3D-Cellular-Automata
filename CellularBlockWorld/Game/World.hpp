@@ -31,8 +31,6 @@ public:
 	void BuildZone2D();
 	void BuildZone3D();
 
-	void TestSolidCellularAutomataPass();
-
 	void GameOfLifeCellularAutomataPass2D();
 	void GameOfLifeCellularAutomataPass3D();
 
