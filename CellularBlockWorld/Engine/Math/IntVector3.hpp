@@ -7,7 +7,8 @@ class IntVector3
 {
 public:
 	IntVector3(){};
-	IntVector3(int InitialX, int InitialY, int InitialZ) {
+	IntVector3(int InitialX, int InitialY, int InitialZ) 
+	{
 		x = InitialX;
 		y = InitialY;
 		z = InitialZ;

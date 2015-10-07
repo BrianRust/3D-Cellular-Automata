@@ -9,7 +9,8 @@ class Vector3
 {
 public:
 	Vector3(){};
-	Vector3(float InitialX, float InitialY, float InitialZ) {
+	Vector3(float InitialX, float InitialY, float InitialZ) 
+	{
 		x = InitialX;
 		y = InitialY;
 		z = InitialZ;

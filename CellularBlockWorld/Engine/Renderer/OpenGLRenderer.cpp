@@ -42,14 +42,16 @@ OpenGLRenderer::OpenGLRenderer()
 }
 
 //----------------------------------
-int OpenGLRenderer::CreateVertexShader(const char* Filename) {
+int OpenGLRenderer::CreateVertexShader(const char* Filename) 
+{
 	FILE * shaderFile;
 	long sizeOfFile;
 	GLchar* shaderText;
 	GLint wasSuccessful;
 	GLint shaderID;
 	shaderFile = fopen ( Filename,"rb");
-	if (shaderFile==NULL) {
+	if (shaderFile==NULL) 
+	{
 		int filePathLength = strlen(Filename);
 		char* errorLength = "File Not Found";
 		char* errorMessage = new char[filePathLength + strlen(errorLength) + 2];
@@ -60,7 +62,8 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename) {
 		//delete[] errorMessage;
 		std::exit(0);
 	}
-	else {
+	else 
+	{
 		fseek (shaderFile, 0, SEEK_END);
 		sizeOfFile = ftell(shaderFile);
 		shaderText = new GLchar[sizeOfFile+1];
@@ -75,7 +78,8 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename) {
 	glCompileShader( shaderID );
 	glGetShaderiv( shaderID, GL_COMPILE_STATUS, &wasSuccessful );
 	delete[] shaderText;
-	if ( wasSuccessful != GL_TRUE ) {
+	if ( wasSuccessful != GL_TRUE )
+	{
 		int errorCounter = 0;
 		GLint infoLogLength;
 		glGetShaderiv( shaderID, GL_INFO_LOG_LENGTH, &infoLogLength );
@@ -83,8 +87,10 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename) {
 		glGetShaderInfoLog( shaderID, infoLogLength, NULL, infoLogText );
 		int filePathLength = strlen(Filename);
 
-		for (int index = 0; index < infoLogLength+1; index++) {
-			if (infoLogText[index] == '\n') {
+		for (int index = 0; index < infoLogLength+1; index++) 
+		{
+			if (infoLogText[index] == '\n') 
+			{
 				errorCounter++;
 			}
 		}
@@ -95,7 +101,8 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename) {
 
 		std::string infoLogString( infoLogText );
 
-		for (int index = 0; index < errorCounter; index++) {
+		for (int index = 0; index < errorCounter; index++) 
+		{
 			infoLogString.replace(infoLogString.find("0("), 2, replaceText);
 		}
 
@@ -114,18 +121,21 @@ int OpenGLRenderer::CreateVertexShader(const char* Filename) {
 }
 
 //----------------------------------
-int OpenGLRenderer::CreateFragmentShader(const char* Filename) {
+int OpenGLRenderer::CreateFragmentShader(const char* Filename) 
+{
 	FILE * shaderFile;
 	long sizeOfFile;
 	GLchar* shaderText;
 	GLint wasSuccessful;
 	GLint shaderID;
 	shaderFile = fopen ( Filename,"rb");
-	if (shaderFile==NULL) {
+	if (shaderFile==NULL) 
+	{
 		int test = MessageBoxA(NULL, Filename, "File Not Found", MB_OK | MB_TOPMOST);
 		std::exit(0);
 	}
-	else {
+	else 
+	{
 		fseek (shaderFile, 0, SEEK_END);
 		sizeOfFile = ftell(shaderFile);
 		shaderText = new GLchar[sizeOfFile+1];
@@ -141,7 +151,8 @@ int OpenGLRenderer::CreateFragmentShader(const char* Filename) {
 
 	glGetShaderiv( shaderID, GL_COMPILE_STATUS, &wasSuccessful );
 	delete[] shaderText;
-	if ( wasSuccessful != GL_TRUE ) {
+	if ( wasSuccessful != GL_TRUE ) 
+	{
 		int errorCounter = 0;
 		GLint infoLogLength;
 		glGetShaderiv( shaderID, GL_INFO_LOG_LENGTH, &infoLogLength );
@@ -149,8 +160,10 @@ int OpenGLRenderer::CreateFragmentShader(const char* Filename) {
 		glGetShaderInfoLog( shaderID, infoLogLength, NULL, infoLogText );
 		int filePathLength = strlen(Filename);
 
-		for (int index = 0; index < infoLogLength+1; index++) {
-			if (infoLogText[index] == '\n') {
+		for (int index = 0; index < infoLogLength+1; index++) 
+		{
+			if (infoLogText[index] == '\n') 
+			{
 				errorCounter++;
 			}
 		}
@@ -161,7 +174,8 @@ int OpenGLRenderer::CreateFragmentShader(const char* Filename) {
 
 		std::string infoLogString( infoLogText );
 
-		for (int index = 0; index < errorCounter; index++) {
+		for (int index = 0; index < errorCounter; index++) 
+		{
 			infoLogString.replace(infoLogString.find("0("), 2, replaceText);
 		}
 
@@ -180,7 +194,8 @@ int OpenGLRenderer::CreateFragmentShader(const char* Filename) {
 }
 
 //----------------------------------
-int OpenGLRenderer::CreateShaderProgram(GLint vertexShaderID, GLint fragmentShaderID) {
+int OpenGLRenderer::CreateShaderProgram(GLint vertexShaderID, GLint fragmentShaderID) 
+{
 	GLint wasSuccessful;
 	GLint shaderProgramID = glCreateProgram();
 	glAttachShader( shaderProgramID, vertexShaderID );
@@ -202,7 +217,8 @@ int OpenGLRenderer::CreateShaderProgram(GLint vertexShaderID, GLint fragmentShad
 }
 
 //----------------------------------
-void OpenGLRenderer::Initialize() {
+void OpenGLRenderer::Initialize() 
+{
 	glGenBuffers = (PFNGLGENBUFFERSPROC) wglGetProcAddress( "glGenBuffers" );
 	glBindBuffer = (PFNGLBINDBUFFERPROC) wglGetProcAddress( "glBindBuffer" );
 	glBufferData = (PFNGLBUFFERDATAPROC) wglGetProcAddress( "glBufferData" );
@@ -244,6 +260,7 @@ void OpenGLRenderer::Initialize() {
 	m_modelViewProjectionUniformLocation = glGetUniformLocation(m_shaderProgramID, "u_modelViewProjectionMatrix");
 	//m_normalAttributeLocation = glGetUniformLocation(m_shaderProgramID, "u_normal");
 	m_normalAttributeLocation = glGetAttribLocation(m_shaderProgramID, "v_Normal");
+	m_cellTypeAttributeLocation = glGetAttribLocation(m_shaderProgramID, "v_Type");
 	m_vertexAttributeLocation = glGetAttribLocation(m_shaderProgramID, "v_Vertex");
 
 	glGenBuffers(1, &m_blockVBOid);
@@ -257,7 +274,8 @@ void OpenGLRenderer::Initialize() {
 }
 
 //-----------------------------------------------------------------------------------------------
-void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition ) {
+void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition, char cellType ) 
+{
 	Vector3 newPosition = Vector3(0.f, 0.f, 0.f);
 	unsigned char sideValue;
 	
@@ -265,156 +283,78 @@ void OpenGLRenderer::AddCubeToBuffer( const Vector3& minPosition ) {
 	//normal = Vector3(0.f, -1.f, 0.f);
 	sideValue = 0;
 	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	
 	//RIGHT
 	//normal = Vector3(1.f, 0.f, 0.f);
 	sideValue = 1;
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 
 	//BACK
 	//normal = Vector3(0.f, 1.f, 0.f);
 	sideValue = 2;
 	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 
 	//TOP
 	//normal = Vector3(0.f, 0.f, 1.f);
 	sideValue = 3;
 	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 
 	//LEFT
 	//normal = Vector3(-1.f, 0.f, 0.f);
 	sideValue = 4;
 	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 
 	//BOTTOM
 	//normal = Vector3(0.f, 0.f, -1.f);
 	sideValue = 5;
 	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-}
-
-//----------------------
-void OpenGLRenderer::AddBlackCubeToBuffer( const Vector3& minPosition )
-{
-	Vector3 newPosition = Vector3(0.f, 0.f, 0.f);
-	unsigned char sideValue;
-
-	//FRONT
-	//normal = Vector3(0.f, -1.f, 0.f);
-	sideValue = 6;
-	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-
-	//RIGHT
-	//normal = Vector3(1.f, 0.f, 0.f);
-	sideValue = 6;
-	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f);
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f);
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-
-	//BACK
-	//normal = Vector3(0.f, 1.f, 0.f);
-	sideValue = 6;
-	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-
-	//TOP
-	//normal = Vector3(0.f, 0.f, 1.f);
-	sideValue = 6;
-	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-
-	//LEFT
-	//normal = Vector3(-1.f, 0.f, 0.f);
-	sideValue = 6;
-	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z + 1.f );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-
-	//BOTTOM
-	//normal = Vector3(0.f, 0.f, -1.f);
-	sideValue = 6;
-	newPosition = Vector3( minPosition.x, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x + 1.f, minPosition.y + 1.f, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
-	newPosition = Vector3( minPosition.x + 1.f, minPosition.y, minPosition.z );
-	m_blockVertices.push_back( Vertex( newPosition, sideValue ) );
+	m_blockVertices.push_back( Vertex( newPosition, sideValue, cellType ) );
 }
 
 //---------------------
-void OpenGLRenderer::SendViewMatrix(const Camera& myCamera ) {
+void OpenGLRenderer::SendViewMatrix(const Camera& myCamera ) 
+{
 	glUseProgram(0);
 	glDisable(GL_TEXTURE_2D);
 	glPushMatrix();
@@ -433,19 +373,22 @@ void OpenGLRenderer::SendViewMatrix(const Camera& myCamera ) {
 }
 
 //---------------------
-void OpenGLRenderer::PopMatrix() {
+void OpenGLRenderer::PopMatrix() 
+{
 	glPopMatrix();
 	m_modelviewProjectionStack.PopMatrix();
 }
 
 //---------------------
-void OpenGLRenderer::PushCubeVerticesToVBO() {
+void OpenGLRenderer::PushCubeVerticesToVBO() 
+{
 	glBindBuffer(GL_ARRAY_BUFFER, m_blockVBOid);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*m_blockVertices.size(),&m_blockVertices.front(),GL_STATIC_DRAW);
 }
 
 //---------------------
-void OpenGLRenderer::SendCubeVBO() {
+void OpenGLRenderer::SendCubeVBO() 
+{
 	glUniformMatrix4fv(m_modelViewProjectionUniformLocation, 1, false, m_modelviewProjectionStack.m_MatrixStack[m_modelviewProjectionStack.m_MatrixStack.size()-1].m_Matrix);
 	glUniform1i( m_wireFrameBoolLocation, 1);
 	
@@ -454,6 +397,8 @@ void OpenGLRenderer::SendCubeVBO() {
 	glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (float*) offsetof(Vertex, positionBytes));
 	glEnableVertexAttribArray(m_normalAttributeLocation);
 	glVertexAttribPointer(m_normalAttributeLocation, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (unsigned char*) offsetof(Vertex, side));
+	glEnableVertexAttribArray(m_cellTypeAttributeLocation);
+	glVertexAttribPointer(m_cellTypeAttributeLocation, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (unsigned char*) offsetof(Vertex, type));
 
 	glDrawArrays(GL_QUADS, 0, m_blockVertices.size());
 
@@ -464,16 +409,19 @@ void OpenGLRenderer::SendCubeVBO() {
 
 	glDisableVertexAttribArray(m_vertexAttributeLocation);
 	glDisableVertexAttribArray(m_normalAttributeLocation);
+	glDisableVertexAttribArray(m_cellTypeAttributeLocation);
 }
 
 //----------------------
-void OpenGLRenderer::DeleteBuffers() {
+void OpenGLRenderer::DeleteBuffers() 
+{
 	//glDeleteBuffers(1, &m_blockVBOid);
 	m_blockVertices.clear();
 }
 
 //-------------------------------------
-void OpenGLRenderer::DrawTargetCellOutline(const Vector3& startPosition) {
+void OpenGLRenderer::DrawTargetCellOutline(const Vector3& startPosition) 
+{
 	RGBA lineColor(1.f, 1.f, 1.f, 1.f);
 	//glUseProgram(0);
 	

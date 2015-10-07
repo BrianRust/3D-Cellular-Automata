@@ -12,12 +12,15 @@
 
 float ClampFloat( float value, float min, float max );
 
-inline float ClampFloat( float value, float min, float max ) {
-	if ( value < min ) {
+inline float ClampFloat( float value, float min, float max ) 
+{
+	if ( value < min ) 
+	{
 		return min;
 	}
 
-	if ( value > max ) {
+	if ( value > max ) 
+	{
 		return max;
 	}
 

@@ -25,8 +25,7 @@ public:
 	OpenGLRenderer();
 	void Initialize();
 	void SendViewMatrix( const Camera& myCamera );
-	void AddCubeToBuffer( const Vector3& minPosition );
-	void AddBlackCubeToBuffer( const Vector3& minPosition );
+	void AddCubeToBuffer( const Vector3& minPosition, char cellType );
 	void PushCubeVerticesToVBO();
 	void PopMatrix();
 	void SendCubeVBO();
@@ -54,6 +53,7 @@ public:
 	GLuint m_wireFrameBoolLocation;
 	GLuint m_modelViewProjectionUniformLocation;
 	GLuint m_normalAttributeLocation;
+	GLuint m_cellTypeAttributeLocation;
 	GLuint m_vertexAttributeLocation;
 };
 extern PFNGLGENBUFFERSPROC glGenBuffers;

@@ -12,21 +12,25 @@ public:
 	CubeCell()
 	{
 		m_isSolid = false;
-		m_isBlack = false;
+		m_cellType = 0;
+		//m_isBlack = false;
 	};
 	CubeCell(bool isSolid)
 	{
 		m_isSolid = isSolid;
-		m_isBlack = false;
+		m_cellType = 0;
+		//m_isBlack = false;
 	};
-	CubeCell(bool isSolid, bool isBlack)
+	CubeCell(bool isSolid, char cellType)
 	{
 		m_isSolid = isSolid;
-		m_isBlack = isBlack;
+		m_cellType = cellType;
+		//m_isBlack = isBlack;
 	};
 
 	bool m_isSolid;
-	bool m_isBlack;
+	//bool m_isBlack;
+	char m_cellType;
 };
 
 #endif //included_CubeCell
