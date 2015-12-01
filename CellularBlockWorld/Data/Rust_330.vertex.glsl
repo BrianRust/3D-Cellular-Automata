@@ -74,6 +74,6 @@ void main()
 	v_surfaceColor.rgb *= mix(0.0, 1.0, clamp(sign(2.0 - v_Type), 0.0, 1.0));
 	v_surfaceColor.rgb *= mix(0.0, 1.0, clamp(sign(3.0 - v_Type), 0.0, 1.0));
 
-	v_surfaceColor.rgb += (vec3(1.0, 1.0, 1.0) * mix(1.0, 0.0, clamp(sign(2.0 - v_Type), 0.0, 1.0)));
+	v_surfaceColor.rgb += (vec3(2.0, 2.0, 2.0) * mix(1.0, 0.0, clamp(sign(2.0 - v_Type), 0.0, 1.0)));
 	v_surfaceColor.rgb += (vec3(0.7, 0.0, 0.5) * mix(1.0, 0.0, clamp(sign(3.0 - v_Type), 0.0, 1.0)));
 }

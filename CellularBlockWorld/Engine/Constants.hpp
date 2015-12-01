@@ -59,7 +59,7 @@ namespace ConstantParameters
 	const unsigned int REMOVE_LIFE_THRESHOLD_UPPERBOUND_3D = 12;
 	const unsigned int REMOVE_LIFE_THRESHOLD_LOWERBOUND_3D = 3;
 
-	const double TIME_BETWEEN_CA_STEPS = 0.15;
+	const double TIME_BETWEEN_CA_STEPS = 0.05;
 
 	
 // 	const unsigned int PRODUCE_LIFE_THRESHOLD_LOWERBOUND_3D = 5;
