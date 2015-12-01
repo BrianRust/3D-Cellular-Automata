@@ -446,9 +446,24 @@ void World::GameOfLifeCellularAutomataPass2D()
 
 			if ( COLORED_COUNTER == BLACK_COUNTER )
 			{
-				if ( COLORED_COUNTER == WHITE_COUNTER )
+				if ( COLORED_COUNTER > WHITE_COUNTER )
 				{
 					m_temporaryCellularVector[index].m_cellType = 3;
+				}
+				else
+				{
+					m_temporaryCellularVector[index].m_cellType = 2;
+				}
+			}
+			else if ( COLORED_COUNTER == WHITE_COUNTER )
+			{
+				if ( COLORED_COUNTER > BLACK_COUNTER )
+				{
+					m_temporaryCellularVector[index].m_cellType = 3;
+				}
+				else
+				{
+					m_temporaryCellularVector[index].m_cellType = 1;
 				}
 			}
 			else if ( ( BLACK_COUNTER > COLORED_COUNTER ) && ( BLACK_COUNTER > WHITE_COUNTER ) )
@@ -638,9 +653,24 @@ void World::GameOfLifeCellularAutomataPass3D()
 
 			if ( COLORED_COUNTER == BLACK_COUNTER )
 			{
-				if ( COLORED_COUNTER == WHITE_COUNTER )
+				if ( COLORED_COUNTER > WHITE_COUNTER )
 				{
 					m_temporaryCellularVector[index].m_cellType = 3;
+				}
+				else
+				{
+					m_temporaryCellularVector[index].m_cellType = 2;
+				}
+			}
+			else if ( COLORED_COUNTER == WHITE_COUNTER )
+			{
+				if ( COLORED_COUNTER > BLACK_COUNTER )
+				{
+					m_temporaryCellularVector[index].m_cellType = 3;
+				}
+				else
+				{
+					m_temporaryCellularVector[index].m_cellType = 1;
 				}
 			}
 			else if ( ( BLACK_COUNTER > COLORED_COUNTER ) && ( BLACK_COUNTER > WHITE_COUNTER ) )
